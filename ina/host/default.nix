@@ -1,0 +1,5 @@
+{name, ...}: {
+  imports = [
+    ./${name}.nix
+  ];
+}
