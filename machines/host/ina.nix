@@ -2,7 +2,6 @@
   lib,
   modulesPath,
   hm,
-  mms,
   ...
 }: {
   deployment = {
@@ -15,7 +14,11 @@
     ++ [
       (modulesPath + "/virtualisation/digital-ocean-config.nix")
       hm.nixosModules.home-manager
-      ./home
+      {
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.users.ony = import ./home;
+      }
     ];
 
   boot.isContainer = true;

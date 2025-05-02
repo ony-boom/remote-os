@@ -1,17 +1,5 @@
-{
-  mms,
-  system,
-  ...
-}: {
-  imports = [
-    mms.homeManagerModules.${system}
-  ];
-
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-
-  home-manager.users.ony = {
-    programs.mms.enable = true;
-  };
+{pkgs, ...}: {
+  home.packages = with pkgs; [bottom];
+  home.stateVersion = "25.05";
 }
 
