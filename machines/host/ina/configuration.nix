@@ -7,13 +7,9 @@
   services.caddy = {
     enable = true;
 
-    virtualHosts."music.ony.world" = {
-      reverseProxy = "http://localhost:3536";
-
-      extraConfig = ''
-        encode gzip
-      '';
-    };
+    virtualHosts."music.ony.world".extraConfig = ''
+      reverse_proxy http://localhost:${config.services.mms.port}
+    '';
   };
 
   networking.firewall.allowedTCPPorts = [config.services.mms.port 80 443];
