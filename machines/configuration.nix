@@ -4,7 +4,7 @@
   ];
   users.users = let
     publicKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFk4ydn78plOeWDhjNZbQSJbKr6mLciXme4XmYmzYnXy onyrakoto27@gmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFgVuwykGRL/ospBa4ZDuHjd1dQhIFL1xrMctx8BWbMm onyrakoto27@gmail.com"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyEacEDE0nUT+0fkFDYpZmjwUUVWVDjQVGoNQctdiHe orakotonirina@bocasay.com"
     ];
   in {

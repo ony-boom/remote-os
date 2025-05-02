@@ -1,10 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    hm = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     mms = {
       url = "github:ony-boom/mms";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -13,7 +9,6 @@
 
   outputs = {
     nixpkgs,
-    hm,
     mms,
     ...
   }: let
@@ -25,7 +20,7 @@
           inherit system;
           overlays = [];
         };
-        specialArgs = {inherit hm mms system;};
+        specialArgs = {inherit mms system;};
       };
 
       defaults = import ./configuration.nix;
