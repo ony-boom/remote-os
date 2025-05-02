@@ -3,6 +3,7 @@
   modulesPath,
   mms,
   system,
+  config,
   ...
 }: {
   deployment = {
@@ -17,7 +18,13 @@
       mms.nixosModules.${system}
     ];
 
-  services.mms.enable = true;
+  services.mms = {
+    enable = true;
+    host = "0.0.0.0";
+  };
+
+  networking.firewall.allowedTCPPorts = [config.services.mms.port];
+
   boot.isContainer = true;
   time.timeZone = "Asia/Singapore";
 }
