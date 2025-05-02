@@ -8,7 +8,7 @@
     enable = true;
 
     virtualHosts."music.ony.world".extraConfig = ''
-      reverse_proxy http://localhost:${config.services.mms.port}
+      reverse_proxy http://localhost:${builtins.toString config.services.mms.port}
     '';
   };
 
