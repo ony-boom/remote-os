@@ -1,10 +1,12 @@
 {
   lib,
   modulesPath,
+  hm,
+  mms,
   ...
 }: {
   deployment = {
-    targetHost = "128.199.228.20";
+    targetHost = "167.99.70.7";
     targetUser = "root";
   };
 
@@ -12,6 +14,8 @@
     lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix
     ++ [
       (modulesPath + "/virtualisation/digital-ocean-config.nix")
+      hm.nixosModules.home-manager
+      ./home
     ];
 
   boot.isContainer = true;
