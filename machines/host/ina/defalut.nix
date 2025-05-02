@@ -3,7 +3,6 @@
   modulesPath,
   mms,
   system,
-  config,
   ...
 }: {
   deployment = {
@@ -11,20 +10,14 @@
     targetUser = "root";
   };
 
+  boot.isContainer = true;
+  time.timeZone = "Asia/Singapore";
+
   imports =
     lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix
     ++ [
       (modulesPath + "/virtualisation/digital-ocean-config.nix")
       mms.nixosModules.${system}
+      ./configuration.nix
     ];
-
-  services.mms = {
-    enable = true;
-    host = "0.0.0.0";
-  };
-
-  networking.firewall.allowedTCPPorts = [config.services.mms.port];
-
-  boot.isContainer = true;
-  time.timeZone = "Asia/Singapore";
 }
