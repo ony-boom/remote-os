@@ -8,11 +8,21 @@
     enable = true;
 
     virtualHosts."music.ony.world".extraConfig = ''
-      reverse_proxy http://localhost:${builtins.toString config.services.mms.port}
+      rate_limit {
+          zone global 20r/s
+        }
+
+        @abusers {
+          header User-Agent "bad-bot"
+        }
+
+        respond @abusers "Blocked" 403
+            reverse_proxy http://localhost:${builtins.toString config.services.mms.port}
     '';
   };
 
-  networking.firewall.allowedTCPPorts = [config.services.mms.port 80 443];
+  services.fail2ban.enable = true;
+  networking.firewall.allowedTCPPorts = [80 443];
 
   users.users.caddy = {
     isSystemUser = true;
