@@ -8,16 +8,12 @@
     enable = true;
 
     virtualHosts."music.ony.world".extraConfig = ''
-      rate_limit {
-          zone global 20r/s
-        }
+      @abusers {
+        header User-Agent "bad-bot"
+      }
 
-        @abusers {
-          header User-Agent "bad-bot"
-        }
-
-        respond @abusers "Blocked" 403
-            reverse_proxy http://localhost:${builtins.toString config.services.mms.port}
+      respond @abusers "Blocked" 403
+      reverse_proxy http://localhost:${builtins.toString config.services.mms.port}
     '';
   };
 
