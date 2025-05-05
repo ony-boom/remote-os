@@ -11,12 +11,6 @@
     root = {
       openssh.authorizedKeys.keys = publicKeys;
     };
-    ony = {
-      isNormalUser = true;
-      home = "/home/ony";
-      extraGroups = ["wheel" "networkmanager"];
-      openssh.authorizedKeys.keys = publicKeys;
-    };
   };
 
   networking = {
