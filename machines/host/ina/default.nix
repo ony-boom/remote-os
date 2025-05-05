@@ -6,7 +6,7 @@
   ...
 }: {
   deployment = {
-    targetHost = "167.99.70.7";
+    targetHost = "104.248.151.237";
     targetUser = "root";
   };
 
