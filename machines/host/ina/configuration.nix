@@ -8,11 +8,6 @@
     enable = true;
 
     virtualHosts."music.ony.world".extraConfig = ''
-      @abusers {
-        header User-Agent "bad-bot"
-      }
-
-      respond @abusers "Blocked" 403
       reverse_proxy http://localhost:${builtins.toString config.services.mms.port}
     '';
   };
