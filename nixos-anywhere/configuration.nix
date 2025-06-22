@@ -9,10 +9,13 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
   ];
+
+
   boot.loader.grub = {
     efiSupport = true;
     efiInstallAsRemovable = true;
   };
+
   services.openssh.enable = true;
 
   environment.systemPackages = map lib.lowPrio [
