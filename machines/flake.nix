@@ -1,6 +1,12 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     mms = {
       url = "github:ony-boom/mms";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -19,6 +25,7 @@
   outputs = {
     nixpkgs,
     mms,
+    disko,
     ...
   }: let
     system = "x86_64-linux";
@@ -29,12 +36,14 @@
           inherit system;
           overlays = [];
         };
-        specialArgs = {inherit mms system;};
+        specialArgs = {inherit mms system disko;};
       };
 
       defaults = import ./configuration.nix;
 
       ina = import ./host;
+
+      hizuru = import ./host;
     };
   };
 }

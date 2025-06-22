@@ -2,6 +2,9 @@
   imports = [
     ./programs
   ];
+
+  services.openssh.enable = true;
+
   users.users = let
     publicKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFgVuwykGRL/ospBa4ZDuHjd1dQhIFL1xrMctx8BWbMm onyrakoto27@gmail.com"
