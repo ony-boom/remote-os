@@ -2,9 +2,9 @@ Managing my vps with `nix` and `nixos` is a great way to ensure that my server i
 
 ## Setup
 
-If using DigitalOcean:
+- If using DigitalOcean:
 
-1. Create a new custom image from the latest NixOS
+Create a new custom image from the latest NixOS
 
 ```sh
 nix run .#buildDoImage
@@ -15,3 +15,6 @@ Import that image into DigitalOcean and create a new droplet with it.
 
 Then inside `./machines`, edit `flake.nix` to add a new machine configuration for your new droplet in the `colmena` section.
 
+- Elsewhere:
+
+Follow the instructions in the [nixos-anywhere repo](https://github.com/nix-community/nixos-anywhere) to install NixOS on the VPS using the `./nixos-anywhere` directory.
