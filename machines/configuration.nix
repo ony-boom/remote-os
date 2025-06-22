@@ -1,6 +1,6 @@
 {
   imports = [
-    ./programs
+    ./defaults
   ];
 
   services.openssh.enable = true;
@@ -18,7 +18,7 @@
 
   networking = {
     firewall = {
-      allowedTCPPorts = [22];
+      allowedTCPPorts = [22 80 443];
     };
   };
 
