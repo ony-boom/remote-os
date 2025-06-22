@@ -1,4 +1,4 @@
-{
+{name, ...}: {
   imports = [
     ./defaults
   ];
@@ -17,6 +17,7 @@
   };
 
   networking = {
+    hostName = name;
     firewall = {
       allowedTCPPorts = [22 80 443];
     };
