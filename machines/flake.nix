@@ -41,9 +41,7 @@
 
       defaults = import ./configuration.nix;
 
-      ina = import ./host;
-
-      hizuru = import ./host;
+      hizuru = import ./host/hizuru;
     };
   };
 }
