@@ -6,7 +6,7 @@
 }: {
   deployment = {
     targetHost = "94.250.201.16";
-    targetUser = "root";
+    targetUser = "ony";
   };
 
   imports = [
