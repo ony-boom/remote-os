@@ -30,7 +30,8 @@
     };
   };
 
-  security.sudo.wheelNeedsPassword = false;
+  nix.settings.trusted-users = ["ony" "root"];
 
+  security.sudo.wheelNeedsPassword = false;
   system.stateVersion = "25.05";
 }
