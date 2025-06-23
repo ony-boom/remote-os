@@ -13,6 +13,8 @@
   in {
     ony = {
       isNormalUser = true;
+      #TODO: Change this password, after the first login;
+      initialPassword = "changeme";
       extraGroups = ["wheel" "networkmanager"];
       openssh.authorizedKeys.keys = publicKeys;
     };
@@ -27,6 +29,8 @@
       allowedTCPPorts = [22 80 443];
     };
   };
+
+  security.sudo.wheelNeedsPassword = false;
 
   system.stateVersion = "25.05";
 }
