@@ -11,6 +11,11 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyEacEDE0nUT+0fkFDYpZmjwUUVWVDjQVGoNQctdiHe orakotonirina@bocasay.com"
     ];
   in {
+    ony = {
+      isNormalUser = true;
+      extraGroups = ["wheel" "networkmanager"];
+      openssh.authorizedKeys.keys = publicKeys;
+    };
     root = {
       openssh.authorizedKeys.keys = publicKeys;
     };
