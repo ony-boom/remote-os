@@ -30,7 +30,17 @@
     };
   };
 
-  nix.settings.trusted-users = ["ony" "root"];
+  nix = {
+    settings = {
+      trusted-users = ["ony" "root"];
+      trusted-substituters = [
+        "https://ony-boom.cachix.org"
+      ];
+      trusted-public-keys = [
+        "ony-boom.cachix.org-1:rPOTyyOCiAhLarertCrNnZLxsBFpcirEekoohcCZt10="
+      ];
+    };
+  };
 
   security.sudo.wheelNeedsPassword = false;
   system.stateVersion = "25.05";
