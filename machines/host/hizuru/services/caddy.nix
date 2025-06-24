@@ -7,6 +7,7 @@
     {
       "devenv.ony.world" = {
         extraConfig = ''
+          tls off
           redir / https://raw.githubusercontent.com/ony-boom/home-manager/refs/heads/main/install.sh 302
         '';
       };
