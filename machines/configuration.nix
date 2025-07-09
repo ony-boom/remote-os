@@ -7,7 +7,7 @@
 
   users.users = let
     publicKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFgVuwykGRL/ospBa4ZDuHjd1dQhIFL1xrMctx8BWbMm onyrakoto27@gmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF+IhjgxWSqhWo6ER2Gw4qyRb5JS7ioJIAKRZFJaId/y ony@maki"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF0tFY9NpB6eoYbbsH4OKxmUNKLo+lSG/l/INATD8uis ony@BCS-MG-LP-0120-09"
     ];
   in {
