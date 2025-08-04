@@ -8,6 +8,5 @@
 
   environment.systemPackages = with pkgs; [
     neofetch
-    openssl
   ];
 }
