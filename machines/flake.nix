@@ -11,14 +11,18 @@
       url = "github:ony-boom/mms";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    ony-world = {
+      url = "github:ony-boom/resume";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     nixpkgs,
-    mms,
     disko,
     ...
-  }: let
+  } @ inputs: let
     system = "x86_64-linux";
   in {
     colmena = {
@@ -27,7 +31,7 @@
           inherit system;
           overlays = [];
         };
-        specialArgs = {inherit mms system disko;};
+        specialArgs = {inherit inputs system disko;};
       };
 
       defaults = import ./configuration.nix;

@@ -1,6 +1,6 @@
 {
   disko,
-  mms,
+  inputs,
   system,
   ...
 }: {
@@ -11,7 +11,7 @@
 
   imports = [
     disko.nixosModules.disko
-    mms.nixosModules.${system}
+    inputs.mms.nixosModules.${system}
 
     ./configuration.nix
     ./hardware-configuration.nix
