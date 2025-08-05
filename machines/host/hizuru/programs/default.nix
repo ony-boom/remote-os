@@ -9,5 +9,7 @@
         };
       };
     };
+
+    starship.enable = true;
   };
 }

@@ -31,6 +31,8 @@
     };
   };
 
+  programs.zsh.enable = true;
+
   networking = {
     hostName = name;
     firewall = {
