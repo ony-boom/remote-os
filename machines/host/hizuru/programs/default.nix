@@ -2,9 +2,11 @@
   programs = {
     git = {
       enable = true;
-      config = {
-        name = "Hizuru";
-        email = "hizuru@ony.world";
+      extarConfig = {
+        user = {
+          name = "Hizuru";
+          email = "hizuru@ony.world";
+        };
       };
     };
   };
