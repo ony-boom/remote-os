@@ -10,6 +10,7 @@
     targetHost = "94.250.201.16";
 
     buildOnTarget = true;
+    allowLocalDeployment = true;
   };
 
   imports = [
