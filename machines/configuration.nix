@@ -12,8 +12,7 @@
   in {
     ony = {
       isNormalUser = true;
-      #TODO: Change this password, after the first login;
-      initialPassword = "changeme";
+      hashedPassword = "$6$74ywRZqjR0/lgpMb$Uwh2Ul9FNj/u.mLtYKPkxVUL0jEjcaVyhUZ84mFShv8gbonujR/cK2lNht0KOKJjMVZ/fVqI9XSLF910g/rNO/";
       extraGroups = ["wheel" "networkmanager"];
       openssh.authorizedKeys.keys = publicKeys;
     };
