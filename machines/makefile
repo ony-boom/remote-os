@@ -1,4 +1,11 @@
-PHONY: all
+COLMENA := nix run .#apps.x86_64-linux.colmena
 
+.PHONY: all local
+
+# Deploy to VPS
 all:
-	nix run .\#apps.x86_64-linux.colmena apply
+	$(COLMENA) apply
+
+# Deploy to local machine
+local:
+	$(COLMENA) apply-local
