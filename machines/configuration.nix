@@ -1,4 +1,8 @@
-{name, ...}: {
+{
+  name,
+  pkgs,
+  ...
+}: {
   imports = [
     ./defaults
   ];
@@ -18,8 +22,11 @@
       hashedPassword = "$6$74ywRZqjR0/lgpMb$Uwh2Ul9FNj/u.mLtYKPkxVUL0jEjcaVyhUZ84mFShv8gbonujR/cK2lNht0KOKJjMVZ/fVqI9XSLF910g/rNO/";
       extraGroups = ["wheel" "networkmanager"];
       openssh.authorizedKeys.keys = publicKeys;
+
+      shell = pkgs.zsh;
     };
     root = {
+      # shell = pkgs.zsh;
       openssh.authorizedKeys.keys = publicKeys;
     };
   };
