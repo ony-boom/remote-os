@@ -16,16 +16,20 @@
       url = "github:ony-boom/resume";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    colmena.url = "github:zhaofengli/colmena";
   };
 
   outputs = {
     nixpkgs,
     disko,
+    colmena,
     ...
   } @ inputs: let
     system = "x86_64-linux";
   in {
-    colmena = {
+    apps.${system}.colmena = colmena.apps.${system}.colmena;
+    colmenaHive = colmena.lib.makeHive {
       meta = {
         nixpkgs = import nixpkgs {
           inherit system;

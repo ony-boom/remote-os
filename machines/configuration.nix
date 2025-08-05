@@ -42,5 +42,20 @@
       ];
     };
   };
+
+  security.sudo.extraRules = [
+    {
+      users = ["ony"];
+      commands = [
+        {
+          command = "ALL";
+          options = [
+            "NOPASSWD"
+          ];
+        }
+      ];
+    }
+  ];
+
   system.stateVersion = "25.05";
 }
