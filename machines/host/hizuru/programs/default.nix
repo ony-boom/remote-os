@@ -2,8 +2,10 @@
   programs = {
     git = {
       enable = true;
-      userName = "Hizuru";
-      userEmail = "hizuru@ony.world";
+      config = {
+        name = "Hizuru";
+        email = "hizuru@ony.world";
+      };
     };
   };
 }
