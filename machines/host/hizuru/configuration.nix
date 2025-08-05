@@ -4,6 +4,7 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
     ./services
+    ./programs
   ];
 
   boot.loader.grub = {
