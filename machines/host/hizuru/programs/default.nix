@@ -2,7 +2,7 @@
   programs = {
     git = {
       enable = true;
-      extarConfig = {
+      config = {
         user = {
           name = "Hizuru";
           email = "hizuru@ony.world";
