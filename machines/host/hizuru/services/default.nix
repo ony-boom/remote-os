@@ -1,7 +1,8 @@
 {
   imports = [
     ./mms.nix
-    ./ony-world.nix
+    ./umami.nix
     ./caddy.nix
+    ./ony-world.nix
   ];
 }
