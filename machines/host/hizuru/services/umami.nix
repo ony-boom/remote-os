@@ -1,5 +1,5 @@
-{pkgs, ...}: {
-  environment.systemPackages = with pkgs; [
-    umami
-  ];
+{
+  services.umami = {
+    enable = true;
+  };
 }
