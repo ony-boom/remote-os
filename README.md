@@ -17,7 +17,7 @@ Then inside `./machines`, edit `flake.nix` to add a new machine configuration fo
 
 - Elsewhere:
 
-Follow the instructions in the [nixos-anywhere repo](https://github.com/nix-community/nixos-anywhere) to install NixOS on the VPS using the `./nixos-anywhere` directory.
+Follow the instructions in the [nixos-anywhere repo](https://github.com/nix-community/nixos-anywhere) to install NixOS on the VPS using the `./builder/nixos-anywhere` directory.
 
 ### Deployment
 
