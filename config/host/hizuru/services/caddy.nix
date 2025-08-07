@@ -33,10 +33,19 @@
       '';
     };
   };
+
+  webhook = {
+    "webhook.ony.world" = {
+      extraConfig = ''
+        reverse_proxy http://127.0.0.1:9000
+      '';
+    };
+  };
 in {
   services.caddy.virtualHosts = lib.mkMerge [
     website
     anlytics
+    webhook
     (lib.mkIf config.services.mms.enable music)
   ];
 }
