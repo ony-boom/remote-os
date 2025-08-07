@@ -13,7 +13,7 @@ nix run .#buildDoImage
 That will create a `result` directory with the image file.
 Import that image into DigitalOcean and create a new droplet with it.
 
-Then inside `./machines`, edit `flake.nix` to add a new machine configuration for your new droplet in the `colmena` section.
+Then inside `./config`, edit `flake.nix` to add a new configuration for your new vps in the `colmena` section.
 
 - Elsewhere:
 
