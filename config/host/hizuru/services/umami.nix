@@ -1,4 +1,8 @@
-{config, ...}: {
+{
+  config,
+  ...
+}: {
+  age.secrets.umami.file = ../secrets/umami.age;
   services.umami = {
     enable = true;
 
