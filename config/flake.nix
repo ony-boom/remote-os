@@ -18,6 +18,8 @@
     };
 
     colmena.url = "github:zhaofengli/colmena";
+
+    agenix.url = "github:ryantm/agenix";
   };
 
   outputs = {
