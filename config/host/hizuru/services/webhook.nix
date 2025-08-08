@@ -5,7 +5,7 @@
 }: let
   redeployScript = pkgs.writeShellScript "redeploy" ''
     set -euo pipefail
-    cd /srv/os-config
+    cd /srv/os-config/config
     make update-local
   '';
 in {
