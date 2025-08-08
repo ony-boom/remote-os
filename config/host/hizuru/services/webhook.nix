@@ -1,5 +1,9 @@
 {config, ...}: {
-  age.secrets.webhook-env.file = ../secrets/webhook-env.age;
+  age.secrets.webhook-env = {
+    file = ../secrets/webhook-env.age;
+    owner = "ony";
+    group = "users";
+  };
 
   services.webhook = {
     enable = true;
@@ -21,7 +25,7 @@
             "trigger-rule": {
               "match": {
                 "type": "payload-hmac-sha256",
-                "secret": "{{ .Env.GH_SECRET }}",
+                "secret": "{{ getenv "GH_SECRET" }}",
                 "parameter": {
                   "source": "header",
                   "name": "X-Hub-Signature-256"
