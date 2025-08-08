@@ -7,9 +7,6 @@
     user = "ony";
     group = "users";
     ip = "127.0.0.1";
-
-    enableTemplates = true;
-
     hooksTemplated = {
       redeploy =
         /*
@@ -25,7 +22,7 @@
                 {
                   "match": {
                     "type": "payload-hmac-sha1",
-                    "secret": "{{ readFile \"${config.age.secrets.gh-hooks.path}\" }}",
+                    "secret": "{{ .Env.GH_SECRET }}",
                     "parameter": {
                       "source": "header",
                       "name": "X-Hub-Signature"
@@ -36,6 +33,9 @@
             }
           }
         '';
+    };
+    environment = {
+      GH_SECRET = config.age.secrets.gh-hooks.path;
     };
   };
 }
