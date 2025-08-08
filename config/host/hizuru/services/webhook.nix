@@ -1,4 +1,14 @@
-{config, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: let
+  redeployScript = pkgs.writeShellScript "redeploy" ''
+    set -euo pipefail
+    cd /srv/os-config
+    make update-local
+  '';
+in {
   age.secrets.webhook-env = {
     file = ../secrets/webhook-env.age;
     owner = "ony";
@@ -20,8 +30,8 @@
         ''
           {
             "id": "redeploy-webhook",
-            "execute-command": "make update-local",
-            "command-working-directory": "/srv/os-config",
+            "command-working-directory": "",
+            "execute-command": "${redeployScript}",
             "trigger-rule": {
               "match": {
                 "type": "payload-hmac-sha256",
