@@ -8,6 +8,7 @@
 
   environment.systemPackages = with pkgs; [
     gnumake
+    bottom
     openssl
     neofetch
   ];
