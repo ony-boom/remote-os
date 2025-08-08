@@ -25,7 +25,7 @@
             "trigger-rule": {
               "match": {
                 "type": "payload-hmac-sha256",
-                "secret": "{{ getenv "GH_SECRET" }}",
+                "secret": "{{ getenv "GH_SECRET" | js }}",
                 "parameter": {
                   "source": "header",
                   "name": "X-Hub-Signature-256"
