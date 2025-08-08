@@ -21,11 +21,11 @@
               "and": [
                 {
                   "match": {
-                    "type": "payload-hmac-sha1",
+                    "type": "payload-hmac-sha256",
                     "secret": "{{ .Env.GH_SECRET }}",
                     "parameter": {
                       "source": "header",
-                      "name": "X-Hub-Signature"
+                      "name": "X-Hub-Signature-256"
                     }
                   }
                 }
@@ -34,8 +34,12 @@
           }
         '';
     };
-    environment = {
-      GH_SECRET = config.age.secrets.gh-hooks.path;
+  };
+
+  # Override the systemd service to load the secret as an environment variable
+  systemd.services.webhook = {
+    serviceConfig = {
+      EnvironmentFile = config.age.secrets.gh-hooks.path;
     };
   };
 }
