@@ -7,6 +7,7 @@
     user = "ony";
     group = "users";
     ip = "127.0.0.1";
+
     hooksTemplated = {
       redeploy =
         /*
@@ -32,10 +33,7 @@
     };
   };
 
-  # Override the systemd service to load the secret as an environment variable
-  systemd.services.webhook = {
-    serviceConfig = {
-      EnvironmentFile = config.age.secrets.webhook-env.path;
-    };
+  systemd.services.webhook.serviceConfig = {
+    EnvironmentFile = config.age.secrets.webhook-env.path;
   };
 }
