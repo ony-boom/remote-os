@@ -39,6 +39,10 @@
 
   nix = {
     settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       trusted-users = ["ony" "root"];
       trusted-substituters = [
         "https://ony-boom.cachix.org"
