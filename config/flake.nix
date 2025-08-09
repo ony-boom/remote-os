@@ -22,6 +22,15 @@
     agenix.url = "github:ryantm/agenix";
   };
 
+  nixConfig = {
+    extra-substituters = [
+      "https://ony-boom.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "ony-boom.cachix.org-1:rPOTyyOCiAhLarertCrNnZLxsBFpcirEekoohcCZt10="
+    ];
+  };
+
   outputs = {
     nixpkgs,
     disko,
