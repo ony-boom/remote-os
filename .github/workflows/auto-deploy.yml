@@ -1,4 +1,4 @@
-name: 🚀 Auto Deploy Apps
+name: Auto Deploy Apps
 on:
   repository_dispatch:
     types: [app-updated]
@@ -20,122 +20,112 @@ jobs:
     timeout-minutes: 30
     
     steps:
-      - name: 🎯 Deployment Info
+      - name: Deployment Info
         run: |
           APP_NAME="${{ github.event.client_payload.app_name || github.event.inputs.app_name }}"
           COMMIT="${{ github.event.client_payload.commit }}"
           AUTHOR="${{ github.event.client_payload.author }}"
-          echo "::notice title=Starting Deployment::🚀 Deploying $APP_NAME"
+          echo "::notice title=Starting Deployment::Deploying $APP_NAME"
           if [ -n "$COMMIT" ]; then
-            echo "::notice title=Trigger Info::📝 Commit: $COMMIT by $AUTHOR"
+            echo "::notice title=Trigger Info::Commit: $COMMIT by $AUTHOR"
           fi
         
-      - name: 📥 Checkout repository  
+      - name: Checkout repository  
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
           
-      - name: 📦 Install Nix
+      - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
         with:
           logger: pretty
           
-      - name: ⚡ Setup Nix Cache
+      - name: Setup Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
-        
-      - name: 🔧 Install Colmena
-        run: |
-          echo "::group::Installing Colmena"
-          nix profile add github:zhaofengli/colmena
-          echo "::endgroup::"
           
-      - name: 🔄 Update Flake Inputs
+      - name: Update Flake Inputs
         working-directory: ./config
         run: |
           APP_NAME="${{ github.event.client_payload.app_name || github.event.inputs.app_name }}"
-          echo "::group::📦 Updating flake inputs for: $APP_NAME"
+          echo "::group::Updating flake inputs for: $APP_NAME"
           
           if [ "$APP_NAME" = "all" ]; then
-            echo "🔄 Updating ALL flake inputs..."
+            echo "Updating ALL flake inputs..."
             nix flake update --commit-lock-file
           else
-            echo "🔄 Updating flake input: $APP_NAME"
+            echo "Updating flake input: $APP_NAME"
             nix flake update "$APP_NAME" --commit-lock-file
           fi
           
-          # Show what changed
-          echo "📋 Changes made:"
+          echo "Changes made:"
           git show --stat HEAD
           echo "::endgroup::"
           
-      - name: ✅ Validate Configuration
+      - name: Validate Configuration
         working-directory: ./config
         run: |
-          echo "::group::🧪 Validating NixOS configuration"
+          echo "::group::Validating NixOS configuration"
           nix flake check --show-trace
           echo "::endgroup::"
           
-      - name: 🔑 Setup SSH for VPS Access
+      - name: Setup SSH for VPS Access
         run: |
-          echo "::group::🔑 Setting up SSH access"
+          echo "::group::Setting up SSH access"
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
-          # Add VPS to known hosts to avoid host verification prompt
           VPS_HOST="${{ secrets.VPS_HOST }}"
           if [ -n "$VPS_HOST" ]; then
             ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
           fi
           
-          # Test SSH connection if VPS_HOST and VPS_USER are provided
           VPS_USER="${{ secrets.VPS_USER }}"
           if [ -n "$VPS_HOST" ] && [ -n "$VPS_USER" ]; then
-            echo "🧪 Testing SSH connection to $VPS_USER@$VPS_HOST"
-            ssh -o BatchMode=yes -o ConnectTimeout=10 "$VPS_USER@$VPS_HOST" "echo '✅ SSH connection successful'" || {
+            echo "Testing SSH connection to $VPS_USER@$VPS_HOST"
+            ssh -o BatchMode=yes -o ConnectTimeout=10 "$VPS_USER@$VPS_HOST" "echo 'SSH connection successful'" || {
               echo "::warning title=SSH Test::Could not test SSH connection, but continuing with deployment"
             }
           else
-            echo "ℹ️ VPS_HOST or VPS_USER not set, skipping SSH test"
+            echo "VPS_HOST or VPS_USER not set, skipping SSH test"
           fi
           echo "::endgroup::"
           
-      - name: 🚢 Deploy with Colmena
+      - name: Deploy with Colmena
         working-directory: ./config
         run: |
-          echo "::group::🚀 Starting Colmena deployment"
-          colmena apply --verbose --show-trace || {
-            echo "::error title=Deployment Failed::❌ Colmena deployment failed"
+          echo "::group::Starting Colmena deployment"
+          make || {
+            echo "::error title=Deployment Failed::Colmena deployment failed"
             exit 1
           }
           echo "::endgroup::"
           
-      - name: 📤 Push Changes to Repository
+      - name: Push Changes to Repository
         run: |
-          echo "::group::📤 Pushing flake.lock changes"
+          echo "::group::Pushing flake.lock changes"
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
           
-          # Check if there are any changes to push
           if git diff --quiet HEAD~1 HEAD; then
-            echo "ℹ️ No changes to push"
+            echo "No changes to push"
           else
             git push origin main || git push origin master || {
               echo "::warning title=Git Push::Could not determine default branch, changes may not be pushed"
             }
-            echo "✅ Changes pushed successfully"
+            echo "Changes pushed successfully"
           fi
           echo "::endgroup::"
           
-      - name: 🎉 Success Notification
+      - name: Success Notification
         if: success()
         run: |
           APP_NAME="${{ github.event.client_payload.app_name || github.event.inputs.app_name }}"
-          echo "::notice title=Deployment Successful::✅ Successfully deployed $APP_NAME to VPS!"
+          echo "::notice title=Deployment Successful::Successfully deployed $APP_NAME to VPS"
           
-      - name: 💥 Failure Notification  
+      - name: Failure Notification  
         if: failure()
         run: |
           APP_NAME="${{ github.event.client_payload.app_name || github.event.inputs.app_name }}"
-          echo "::error title=Deployment Failed::❌ Failed to deploy $APP_NAME. Check logs above for details."
+          echo "::error title=Deployment Failed::Failed to deploy $APP_NAME. Check logs above for details."
