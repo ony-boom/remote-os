@@ -9,5 +9,4 @@ let
   ];
 in {
   "umami.age".publicKeys = hizuru ++ maki;
-  "webhook-env.age".publicKeys = hizuru ++ maki;
 }
