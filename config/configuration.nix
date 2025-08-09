@@ -12,6 +12,8 @@
   users.users = let
     publicKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF+IhjgxWSqhWo6ER2Gw4qyRb5JS7ioJIAKRZFJaId/y ony@maki"
+
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC1M4MDbwNVI0Kaiqh2X1L/gPeUASYca0eEV9Ip0Uo/B github-actions@hizuru"
     ];
   in {
     ony = {
@@ -33,9 +35,7 @@
       extraGroups = [
         "wheel"
       ];
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC1M4MDbwNVI0Kaiqh2X1L/gPeUASYca0eEV9Ip0Uo/B github-actions@hizuru"
-      ];
+      openssh.authorizedKeys.keys = publicKeys;
     };
   };
 
