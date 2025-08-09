@@ -1,4 +1,4 @@
-COLMENA ?= nix run .\#apps.x86_64-linux.colmena
+COLMENA ?= nix --accept-flake-config run .\#apps.x86_64-linux.colmena
 
 .PHONY: all local update-local update
 
