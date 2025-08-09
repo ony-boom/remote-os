@@ -76,20 +76,56 @@ jobs:
           nix flake check --show-trace
           echo "::endgroup::"
           
+      - name: 🔑 Setup SSH for VPS Access
+        run: |
+          echo "::group::🔑 Setting up SSH access"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Add VPS to known hosts to avoid host verification prompt
+          VPS_HOST="${{ secrets.VPS_HOST }}"
+          if [ -n "$VPS_HOST" ]; then
+            ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          fi
+          
+          # Test SSH connection if VPS_HOST and VPS_USER are provided
+          VPS_USER="${{ secrets.VPS_USER }}"
+          if [ -n "$VPS_HOST" ] && [ -n "$VPS_USER" ]; then
+            echo "🧪 Testing SSH connection to $VPS_USER@$VPS_HOST"
+            ssh -o BatchMode=yes -o ConnectTimeout=10 "$VPS_USER@$VPS_HOST" "echo '✅ SSH connection successful'" || {
+              echo "::warning title=SSH Test::Could not test SSH connection, but continuing with deployment"
+            }
+          else
+            echo "ℹ️ VPS_HOST or VPS_USER not set, skipping SSH test"
+          fi
+          echo "::endgroup::"
+          
       - name: 🚢 Deploy with Colmena
         working-directory: ./config
         run: |
           echo "::group::🚀 Starting Colmena deployment"
-          
-          # Add SSH key if needed (uncomment and add SSH_PRIVATE_KEY secret)
-          # mkdir -p ~/.ssh
-          # echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          # chmod 600 ~/.ssh/id_rsa
-          
-          colmena apply --verbose --show-trace --on @target || {
+          colmena apply --verbose --show-trace || {
             echo "::error title=Deployment Failed::❌ Colmena deployment failed"
             exit 1
           }
+          echo "::endgroup::"
+          
+      - name: 📤 Push Changes to Repository
+        run: |
+          echo "::group::📤 Pushing flake.lock changes"
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # Check if there are any changes to push
+          if git diff --quiet HEAD~1 HEAD; then
+            echo "ℹ️ No changes to push"
+          else
+            git push origin main || git push origin master || {
+              echo "::warning title=Git Push::Could not determine default branch, changes may not be pushed"
+            }
+            echo "✅ Changes pushed successfully"
+          fi
           echo "::endgroup::"
           
       - name: 🎉 Success Notification
