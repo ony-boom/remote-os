@@ -4,14 +4,18 @@ in {
   virtualisation.oci-containers.containers.blackcandy = {
     image = "ghcr.io/blackcandy-org/blackcandy:latest ";
     ports = [
-      "127.0.0.1:${port}:${port}"
+      "${port}:80"
     ];
 
-    /*
-       environment = {
-      MEDIA_PATH = "/home/ony/Music";
+    volumes = [
+      "/home/ony/Music:/media_data"
+      "/home/ony/.local/share/blackcandy:/app/storage"
+    ];
+
+    environment = {
+      MEDIA_PATH = "media_data";
     };
-    */
+
     autoStart = true;
   };
 }
