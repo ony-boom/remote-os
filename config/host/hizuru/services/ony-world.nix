@@ -5,7 +5,7 @@
 }: let
   ony-world = inputs.ony-world.packages.${system}.default;
 in {
-  caddy.virtualHosts = {
+  services.caddy.virtualHosts = {
     "ony.world" = {
       extraConfig = ''
         reverse_proxy http://localhost:4321
