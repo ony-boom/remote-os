@@ -1,6 +1,5 @@
 {
   imports = [
-    ./mms.nix
     ./umami.nix
     ./ony-world.nix
     ./tailscale.nix

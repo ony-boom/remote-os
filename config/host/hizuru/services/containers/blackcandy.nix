@@ -13,7 +13,7 @@ in {
     ];
 
     environment = {
-      MEDIA_PATH = "media_data";
+      MEDIA_PATH = "/media_data";
     };
 
     autoStart = true;

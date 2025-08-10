@@ -6,6 +6,12 @@ in {
     ports = [
       "127.0.0.1:${port}:${port}"
     ];
+
+    environment = {
+      PUID = "1000";
+      PGID = "100";
+    };
+
     volumes = [
       "/home/ony/Music:/downloads"
       "/home/ony/.config/deemix:/config"
