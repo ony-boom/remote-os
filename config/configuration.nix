@@ -48,6 +48,8 @@
     };
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   nix = {
     settings = {
       experimental-features = [
@@ -61,6 +63,7 @@
       trusted-public-keys = [
         "ony-boom.cachix.org-1:rPOTyyOCiAhLarertCrNnZLxsBFpcirEekoohcCZt10="
       ];
+      download-buffer-size = 524288000;
     };
   };
 
