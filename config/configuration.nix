@@ -7,7 +7,13 @@
     ./defaults
   ];
 
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "prohibit-password";
+    };
+  };
 
   users.users = let
     publicKeys = [

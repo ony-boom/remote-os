@@ -13,7 +13,7 @@ in {
     };
 
     volumes = [
-      "/home/ony/Music:/downloads"
+      "/media/music:/downloads"
       "/home/ony/.config/deemix:/config"
     ];
     autoStart = true;
