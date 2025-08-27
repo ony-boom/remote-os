@@ -12,6 +12,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    mms.url = "github:ony-boom/mms";
+
     colmena.url = "github:zhaofengli/colmena";
 
     agenix.url = "github:ryantm/agenix";

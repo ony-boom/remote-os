@@ -1,4 +1,9 @@
-{disko, ...}: {
+{
+  disko,
+  inputs,
+  system,
+  ...
+}: {
   deployment = {
     targetPort = 22;
     targetUser = "ony";
@@ -10,6 +15,7 @@
 
   imports = [
     disko.nixosModules.disko
+    inputs.mms.nixosModules.${system}
     ./configuration.nix
     ./hardware-configuration.nix
   ];

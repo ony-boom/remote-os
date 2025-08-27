@@ -9,4 +9,5 @@ let
   ];
 in {
   "umami.age".publicKeys = hizuru ++ maki;
+  "mms.age".publicKeys = hizuru ++ maki;
 }
