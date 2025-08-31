@@ -7,11 +7,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ony-world = {
-      url = "github:ony-boom/resume";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     mms.url = "github:ony-boom/mms";
 
     colmena.url = "github:zhaofengli/colmena";

@@ -180,11 +180,11 @@
         "nixpkgs-prisma-6": "nixpkgs-prisma-6"
       },
       "locked": {
-        "lastModified": 1756315314,
-        "narHash": "sha256-IceR9lbMGUBcpovqPQ/A0UBL526NCmXUdT0dHOg82E4=",
+        "lastModified": 1756475378,
+        "narHash": "sha256-0pD17oL+OOyDRo8nH3G9S9nWSGL4sFXF2SsatW9X56A=",
         "owner": "ony-boom",
         "repo": "mms",
-        "rev": "8e5ed57dfb941328e79b6f3ff1c871190c4e8824",
+        "rev": "044a5ecca3e52ba557916e9267a1b1065a9ad1cf",
         "type": "github"
       },
       "original": {
@@ -264,11 +264,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1756125398,
-        "narHash": "sha256-XexyKZpf46cMiO5Vbj+dWSAXOnr285GHsMch8FBoHbc=",
+        "lastModified": 1752687322,
+        "narHash": "sha256-RKwfXA4OZROjBTQAl9WOZQFm7L8Bo93FQwSJpAiSRvo=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "3b9f00d7a7bf68acd4c4abb9d43695afb04e03a5",
+        "rev": "6e987485eb2c77e5dcc5af4e3c70843711ef9251",
         "type": "github"
       },
       "original": {
