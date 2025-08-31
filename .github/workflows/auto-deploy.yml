@@ -12,7 +12,6 @@ on:
         options:
           - all
           - mms
-          - ony-world
 
 jobs:
   deploy:
