@@ -1,4 +1,4 @@
-{
+{pkgs, ...}: {
   programs = {
     git = {
       enable = true;
@@ -11,5 +11,11 @@
     };
 
     starship.enable = true;
+  };
+
+  environment = {
+    systemPackages = with pkgs; [
+      go
+    ];
   };
 }
