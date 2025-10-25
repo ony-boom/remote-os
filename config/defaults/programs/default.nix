@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   programs = {
+    mosh.enable = true;
     neovim = {
       enable = true;
       defaultEditor = true;
