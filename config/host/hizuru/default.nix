@@ -16,6 +16,12 @@
   imports = [
     disko.nixosModules.disko
     inputs.mms.nixosModules.${system}.default
+    inputs.copyparty.nixosModules.default
+
+    {
+      nixpkgs.overlays = [inputs.copyparty.overlays.default];
+    }
+
     ./configuration.nix
     ./hardware-configuration.nix
   ];
