@@ -15,7 +15,7 @@
 
   imports = [
     disko.nixosModules.disko
-    inputs.mms.nixosModules.${system}
+    inputs.mms.nixosModules.${system}.default
     ./configuration.nix
     ./hardware-configuration.nix
   ];
