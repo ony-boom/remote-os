@@ -195,11 +195,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1761454163,
-        "narHash": "sha256-ntSFHtcvyQsFOsNJFtEmYdxfeUDJ2QoH2ExzpmQRjHE=",
+        "lastModified": 1761673060,
+        "narHash": "sha256-OhogC1m6+4WIdEqNZxio1z7vf29KdG7ACTwGnKXqne8=",
         "owner": "ony-boom",
         "repo": "mms",
-        "rev": "feeaf9667ffce3956219d03d5e435bcce689fe64",
+        "rev": "857bbedf70609c1af988da8cebcba19978269450",
         "type": "github"
       },
       "original": {

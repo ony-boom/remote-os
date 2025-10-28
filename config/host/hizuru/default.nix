@@ -15,7 +15,7 @@
 
   imports = [
     disko.nixosModules.disko
-    inputs.mms.nixosModules.${system}.default
+    inputs.mms.nixosModules.default
     inputs.copyparty.nixosModules.default
 
     {
