@@ -6,10 +6,15 @@
   ony-world = inputs.ony-world.packages.${pkgs.system}.default;
 in {
   services.caddy.virtualHosts = {
-    ":80" = {
+    "ony.world" = {
       extraConfig = ''
         root * ${ony-world}/var/www/ony.world
         file_server
+      '';
+    };
+    "www.ony.world" = {
+      extraConfig = ''
+        redir https://ony.world{uri}
       '';
     };
   };
