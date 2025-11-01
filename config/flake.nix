@@ -8,6 +8,7 @@
     };
 
     mms.url = "github:ony-boom/mms";
+    ony-world.url = "github:ony-boom/ony.world";
 
     colmena.url = "github:zhaofengli/colmena";
 

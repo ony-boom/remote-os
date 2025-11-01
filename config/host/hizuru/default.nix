@@ -1,7 +1,6 @@
 {
   disko,
   inputs,
-  system,
   ...
 }: {
   deployment = {
@@ -17,7 +16,6 @@
     disko.nixosModules.disko
     inputs.mms.nixosModules.default
     inputs.copyparty.nixosModules.default
-
     {
       nixpkgs.overlays = [inputs.copyparty.overlays.default];
     }
