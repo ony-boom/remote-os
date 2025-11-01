@@ -22,7 +22,7 @@ in {
 
     "umami.ony.world" = {
       extraConfig = ''
-        reverse_proxy http://${umami-settings.HOSTNAME}:${umami-settings.PORT}
+        reverse_proxy http://${umami-settings.HOSTNAME}:${toString umami-settings.PORT}
       '';
     };
   };
