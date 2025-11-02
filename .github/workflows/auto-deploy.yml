@@ -11,7 +11,7 @@ on:
         type: choice
         options:
           - all
-          - mms
+          - ony-world
 
 jobs:
   deploy:
