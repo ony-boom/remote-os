@@ -12,6 +12,11 @@ in {
       extraConfig = ''
         root * ${ony-world}/var/www/ony.world
         file_server
+
+        handle /media/videos/* {
+          root * /media/videos/ony.world
+          file_server
+        }
       '';
     };
     "www.ony.world" = {

@@ -13,6 +13,17 @@
     options = ["bind"];
   };
 
+  fileSystems."media/videos" = {
+    device = "/home/ony/Videos";
+    fsType = "none";
+    options = ["bind"];
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /media/videos 0755 ony ony -"
+    "Z /media/videos 0755 root root -"
+  ];
+
   boot.loader.grub = {
     efiSupport = true;
     efiInstallAsRemovable = true;
