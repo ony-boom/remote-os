@@ -11,13 +11,9 @@ in {
     "ony.world" = {
       extraConfig = ''
         root * ${ony-world}/var/www/ony.world
-
-        try_files {path} /index.html
-
         file_server
       '';
     };
-
     "www.ony.world" = {
       extraConfig = ''
         redir https://ony.world{uri}
