@@ -18,6 +18,13 @@
           rw = ["ony"];
         };
       };
+      "/videos" = {
+        path = "/media/videos";
+        access = {
+          r = "*";
+          rw = ["ony"];
+        };
+      };
     };
   };
 }

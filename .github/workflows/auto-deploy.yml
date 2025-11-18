@@ -57,7 +57,7 @@ jobs:
             nix flake update --commit-lock-file
           else
             echo "Updating flake input: $APP_NAME"
-            nix flake update "$APP_NAME" --commit-lock-file
+            nix flake update "$APP_NAME" --accept-flake-config --commit-lock-file
           fi
           
           echo "Changes made:"

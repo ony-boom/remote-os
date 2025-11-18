@@ -10,13 +10,13 @@ in {
   services.caddy.virtualHosts = {
     "ony.world" = {
       extraConfig = ''
+        # handle_path /media/videos/* {
+        #   root * /media/videos/ony.world
+        #   file_server
+        # }
+
         root * ${ony-world}/var/www/ony.world
         file_server
-
-        handle /media/videos/* {
-          root * /media/videos/ony.world
-          file_server
-        }
       '';
     };
     "www.ony.world" = {
@@ -28,6 +28,12 @@ in {
     "umami.ony.world" = {
       extraConfig = ''
         reverse_proxy http://${umami-settings.HOSTNAME}:${toString umami-settings.PORT}
+      '';
+    };
+
+    "file.ony.world" = {
+      extraConfig = ''
+        reverse_proxy http://127.0.0.1:3923
       '';
     };
   };
