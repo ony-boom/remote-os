@@ -11,12 +11,21 @@ in {
     "ony.world" = {
       extraConfig = ''
         root * ${ony-world}/var/www/ony.world
-        file_server
 
-        handle {
-          try_files {path} {path}/ index.html
-        }
-      '';
+        # Rewrite clean URLs to their .html equivalents
+        # Example:
+        #   /projects → /projects.html
+        #   /projects/my-music-server → /projects/my-music-server.html
+        @html_no_ext path_regexp html_no_ext ^(.+?)/?$
+        rewrite @html_no_ext {1}.html
+
+        # Fallback behavior:
+        # - if a file exists: serve it
+        # - if a folder contains index.html: serve it
+        # - else fallback to /index.html (SPA routes)
+        try_files {path} {path}/index.html /index.html
+
+        file_server      '';
     };
     "www.ony.world" = {
       extraConfig = ''
