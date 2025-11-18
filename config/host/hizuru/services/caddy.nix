@@ -10,15 +10,14 @@ in {
   services.caddy.virtualHosts = {
     "ony.world" = {
       extraConfig = ''
-        # handle_path /media/videos/* {
-        #   root * /media/videos/ony.world
-        #   file_server
-        # }
-
         root * ${ony-world}/var/www/ony.world
+
+        try_files {path} /index.html
+
         file_server
       '';
     };
+
     "www.ony.world" = {
       extraConfig = ''
         redir https://ony.world{uri}
