@@ -12,20 +12,25 @@ in {
       extraConfig = ''
         root * ${ony-world}/var/www/ony.world
 
-        # Rewrite clean URLs to their .html equivalents
-        # Example:
-        #   /projects → /projects.html
-        #   /projects/my-music-server → /projects/my-music-server.html
-        @html_no_ext path_regexp html_no_ext ^(.+?)/?$
-        rewrite @html_no_ext {1}.html
+        handle {
+            file_server {
+                pass_thru
+            }
 
-        # Fallback behavior:
-        # - if a file exists: serve it
-        # - if a folder contains index.html: serve it
-        # - else fallback to /index.html (SPA routes)
-        try_files {path} {path}/index.html /index.html
+            encode zstd gzip
 
-        file_server      '';
+            # Try the path, then path.html
+            # e.g. /projects → /projects.html
+            try_files {path} {path}.html
+        }
+
+        # SECOND BLOCK — fallback to SvelteKit app (SPA behavior)
+        handle {
+            # Fallback to index.html (your build does not include `200.html`)
+            rewrite * /index.html
+            file_server
+        }
+      '';
     };
     "www.ony.world" = {
       extraConfig = ''
