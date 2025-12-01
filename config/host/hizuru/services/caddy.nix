@@ -49,5 +49,17 @@ in {
         reverse_proxy http://127.0.0.1:3923
       '';
     };
+
+    "aresthegreek.work" = {
+      extraconfig = ''
+        redir 302 https://aresthegreek.framer.website{uri}
+      '';
+    };
+
+    "www.aresthegreek.work" = {
+      extraconfig = ''
+        redir 302 https://aresthegreek.framer.website{uri}
+      '';
+    };
   };
 }
