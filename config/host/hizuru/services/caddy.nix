@@ -52,13 +52,13 @@ in {
 
     "aresthegreek.work" = {
       extraConfig = ''
-        redir 302 https://aresthegreek.framer.website{uri}
+        redir https://aresthegreek.framer.website{uri} 302
       '';
     };
 
     "www.aresthegreek.work" = {
       extraConfig = ''
-        redir 302 https://aresthegreek.framer.website{uri}
+        redir https://aresthegreek.framer.website{uri} 302
       '';
     };
   };
