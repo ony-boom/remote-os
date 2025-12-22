@@ -10,7 +10,9 @@
     mms.url = "github:ony-boom/mms";
     ony-world.url = "github:ony-boom/ony.world";
 
-    colmena.url = "github:zhaofengli/colmena";
+    colmena = {
+      url = "github:zhaofengli/colmena";
+    };
 
     copyparty.url = "github:9001/copyparty";
     agenix.url = "github:ryantm/agenix";
