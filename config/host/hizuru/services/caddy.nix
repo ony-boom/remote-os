@@ -4,7 +4,7 @@
   config,
   ...
 }: let
-  ony-world = inputs.ony-world.packages.${pkgs.system}.default;
+  ony-world = inputs.ony-world.packages.${pkgs.stdenv.hostPlatform.system}.default;
   umami-settings = config.services.umami.settings;
 in {
   services.caddy.virtualHosts = {
