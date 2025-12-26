@@ -450,11 +450,11 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1766739547,
-        "narHash": "sha256-j2R/Efs0OmOXXR6P3Xo9uJ2Bpsvs/X4IzHjQMV49a6U=",
+        "lastModified": 1766744090,
+        "narHash": "sha256-nrlyyTd9tDcqqfkRLyOMjyhvGclTpi9l4vkiC2uGCoI=",
         "owner": "ony-boom",
         "repo": "vps-simple-CD",
-        "rev": "1375cc99ecf2c9a5607ffbebf98c5a6481babf5c",
+        "rev": "57398b0817edad7146f8717d6712df26ce08df17",
         "type": "github"
       },
       "original": {
