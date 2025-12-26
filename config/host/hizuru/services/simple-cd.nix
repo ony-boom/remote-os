@@ -20,6 +20,7 @@ in {
       Restart = "on-failure";
 
       Environment = [
+        "PATH=/run/current-system/sw/bin"
         "NODE_ENV=production"
       ];
       EnvironmentFile = [
