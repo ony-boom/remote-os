@@ -9,7 +9,6 @@
 
     mms.url = "github:ony-boom/mms";
     ony-world.url = "github:ony-boom/ony.world";
-    simple-cd.url = "github:ony-boom/vps-simple-CD";
 
     colmena = {
       url = "github:zhaofengli/colmena";
