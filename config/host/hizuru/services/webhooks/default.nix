@@ -22,6 +22,7 @@
       gnumake
       sudo
       coreutils
+      openssh
     ];
 
     serviceConfig = {
