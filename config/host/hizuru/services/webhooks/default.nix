@@ -15,22 +15,22 @@
     after = ["network.target"];
     wantedBy = ["multi-user.target"];
 
-    path = with pkgs; [
-      bash
-      git
-      nix
-      gnumake
-      sudo
-      coreutils
-      openssh
-    ];
-
     serviceConfig = {
-      User = "ony";
       ExecStart = "${lib.getExe pkgs.webhook} -ip 127.0.0.1 -template -verbose -hooks /etc/webhooks/hooks";
-      EnvironmentFile = [
-        config.age.secrets.webhooks.path
-      ];
+      User = "ony";
+      Group = "users";
+
+      # Use system wrappers for sudo
+      Environment = "PATH=/run/wrappers/bin:${lib.makeBinPath (with pkgs; [
+        bash
+        git
+        openssh
+        nix
+        gnumake
+        coreutils
+      ])}";
+
+      EnvironmentFile = config.age.secrets.webhooks.path;
     };
   };
 }
