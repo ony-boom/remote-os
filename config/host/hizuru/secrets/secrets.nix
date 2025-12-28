@@ -11,4 +11,5 @@ in {
   "mms.age".publicKeys = hizuru ++ maki;
   "copyparty.age".publicKeys = hizuru ++ maki;
   "umami.age".publicKeys = hizuru ++ maki;
+  "webhooks.age".publicKeys = hizuru ++ maki;
 }

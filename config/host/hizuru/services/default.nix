@@ -6,6 +6,7 @@
     ./umami.nix
     ./copyparty.nix # file server
 
+    ./webhooks
     # docker/podman containers as services
     ./containers
   ];

@@ -1,0 +1,25 @@
+---
+- id: redeploy
+  execute-command: "{{getenv "CMD" | js}}"
+  command-working-directory: "{{getenv "WORKING_DIR" | js}}"
+  log-stdout: true
+
+  pass-arguments-to-command:
+  - source: payload
+    name: head_commit.id
+  - source: payload
+    name: repository.name
+
+  pass-environment-to-command:
+  - source: "string"
+    envname: "ENV"
+    name: "{{getenv "ENV" | js}}"
+
+  trigger-rule:
+    match:
+      type: payload-hmac-sha1
+      secret: "{{ getenv "SECRET" | js }}"
+      parameter:
+        source: header
+        name: X-Hub-Signature
+
