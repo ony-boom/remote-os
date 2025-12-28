@@ -25,10 +25,8 @@
     ];
 
     serviceConfig = {
+      User = "ony";
       ExecStart = "${lib.getExe pkgs.webhook} -ip 127.0.0.1 -template -verbose -hooks /etc/webhooks/hooks";
-      # Environment = [
-      #   "PATH=/run/current-system/sw/bin"
-      # ];
       EnvironmentFile = [
         config.age.secrets.webhooks.path
       ];
