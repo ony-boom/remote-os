@@ -8,7 +8,6 @@ let
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF+IhjgxWSqhWo6ER2Gw4qyRb5JS7ioJIAKRZFJaId/y ony@maki"
   ];
 in {
-  "mms.age".publicKeys = hizuru ++ maki;
   "copyparty.age".publicKeys = hizuru ++ maki;
   "umami.age".publicKeys = hizuru ++ maki;
   "webhooks.age".publicKeys = hizuru ++ maki;

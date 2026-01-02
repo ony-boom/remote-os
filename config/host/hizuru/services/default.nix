@@ -1,6 +1,5 @@
 {
   imports = [
-    ./mms.nix
     ./caddy.nix
     ./tailscale.nix
     ./umami.nix
