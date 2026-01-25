@@ -25,6 +25,14 @@
           rw = ["ony"];
         };
       };
+
+      "/pictures" = {
+        path = "/media/pictures";
+        access = {
+          r = "*";
+          rw = ["ony"];
+        };
+      };
     };
   };
 }

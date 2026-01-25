@@ -19,6 +19,12 @@
     options = ["bind"];
   };
 
+  fileSystems."media/pictures" = {
+    device = "/home/ony/Pictures";
+    fsType = "none";
+    options = ["bind"];
+  };
+
   systemd.tmpfiles.rules = [
     "d /media/videos 0755 ony ony -"
     "Z /media/videos 0755 root root -"
