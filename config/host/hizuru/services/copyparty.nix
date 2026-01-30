@@ -6,6 +6,18 @@
 
     user = "root";
 
+    settings = {
+      i = "127.0.0.1";
+      p = [3923];
+      no-reload = true;
+    };
+
+    globalExtraConfig = ''
+      rproxy: 1
+      xff-hdr: x-forwarded-for
+      xff-src: 127.0.0.1
+    '';
+
     accounts = {
       ony.passwordFile = config.age.secrets.copyparty.path;
     };
@@ -18,6 +30,7 @@
           rw = ["ony"];
         };
       };
+
       "/videos" = {
         path = "/media/videos";
         access = {
