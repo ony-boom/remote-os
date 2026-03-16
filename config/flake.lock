@@ -277,11 +277,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1773602480,
-        "narHash": "sha256-K+KqBun/RrqOX2hSetCEdQpBFU9HWL8ETsmYMOpKNLU=",
+        "lastModified": 1773632015,
+        "narHash": "sha256-yPTUrCRxMoswmdKbhhNAnbYFmM+TdK/x7z/+KQmrtQY=",
         "owner": "ony-boom",
         "repo": "ony.world",
-        "rev": "03a3d363125b79dd6613a908a19356fcb4fb85ca",
+        "rev": "a72a8d643e6d6dcf7cc2c1ac1b87159cc5e4eccf",
         "type": "github"
       },
       "original": {
