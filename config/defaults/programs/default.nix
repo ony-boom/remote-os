@@ -11,6 +11,6 @@
     gnumake
     bottom
     openssl
-    neofetch
+    fastfetch
   ];
 }
