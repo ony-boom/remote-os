@@ -11,6 +11,7 @@
     gnumake
     bottom
     openssl
+    ffmpeg
     fastfetch
   ];
 }
