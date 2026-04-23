@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }: let
   mmd = inputs.mmd.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -16,10 +17,12 @@ in {
     };
 
     serviceConfig = {
-      ExecStart = "${mmd}/bin/spotiflac";
+      ExecStart = "${lib.getExe mmd}";
       Restart = "on-failure";
       RestartSec = 5;
       User = "ony";
+      StateDirectory = "mmd";
+      WorkingDirectory = "/var/lib/mmd";
     };
   };
 }

@@ -177,16 +177,16 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1776795238,
-        "narHash": "sha256-hnHjrGjmOE/Si2MVUVUmEkFots/AEEQispuqhJcIpxY=",
+        "lastModified": 1776880562,
+        "narHash": "sha256-sU2eRYzK7wqoLOPj3+hC1IMZe3kmcpxshltfgmemyPo=",
         "owner": "ony-boom",
-        "repo": "ony.world",
-        "rev": "157cca7ff2e6c3e872e44763024c2000e9ea143c",
+        "repo": "mmd",
+        "rev": "99182a6d700244b02801bf1c312711999124f99f",
         "type": "github"
       },
       "original": {
         "owner": "ony-boom",
-        "repo": "ony.world",
+        "repo": "mmd",
         "type": "github"
       }
     },
@@ -260,11 +260,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1761907660,
-        "narHash": "sha256-kJ8lIZsiPOmbkJypG+B5sReDXSD1KGu2VEPNqhRa/ew=",
+        "lastModified": 1776548001,
+        "narHash": "sha256-ZSK0NL4a1BwVbbTBoSnWgbJy9HeZFXLYQizjb2DPF24=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "2fb006b87f04c4d3bdf08cfdbc7fab9c13d94a15",
+        "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
         "type": "github"
       },
       "original": {

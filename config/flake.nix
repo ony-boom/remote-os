@@ -8,7 +8,7 @@
     };
 
     ony-world.url = "github:ony-boom/ony.world";
-    mmd.url = "github:ony-boom/ony.world";
+    mmd.url = "github:ony-boom/mmd";
 
     colmena = {
       url = "github:zhaofengli/colmena";
