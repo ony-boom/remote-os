@@ -13,6 +13,7 @@ in {
 
     environment = {
       PORT = "3080";
+      SPOTIFLAC_OUTPUT_DIR = "/media/music";
     };
 
     serviceConfig = {
