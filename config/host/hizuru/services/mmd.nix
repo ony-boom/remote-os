@@ -1,10 +1,9 @@
 {
   inputs,
   pkgs,
-  lib,
   ...
 }: let
-  mmd = lib.getExe inputs.ony-world.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  mmd = inputs.mmd.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in {
   systemd.services.mmd = {
     description = "MMD Server";
@@ -17,7 +16,7 @@ in {
     };
 
     serviceConfig = {
-      ExecStart = mmd;
+      ExecStart = "${mmd}/bin/spotiflac";
       Restart = "on-failure";
       RestartSec = 5;
       User = "ony";
