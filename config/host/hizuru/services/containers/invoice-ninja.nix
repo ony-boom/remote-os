@@ -3,6 +3,12 @@
 in {
   age.secrets.invoice-ninja.file = ../../secrets/invoice-ninja.age;
 
+  systemd.tmpfiles.rules = [
+    "d /var/lib/invoice-ninja         0755 1500 1500 -"
+    "d /var/lib/invoice-ninja/public  0755 1500 1500 -"
+    "d /var/lib/invoice-ninja/storage 0755 1500 1500 -"
+  ];
+
   virtualisation.oci-containers.containers.invoice-ninja = {
     image = "invoiceninja/invoiceninja:5";
     ports = [
@@ -23,8 +29,6 @@ in {
       DB_USERNAME = "invoiceninja";
 
       MULTI_DB_ENABLED = "false";
-      PUID = "1000";
-      PGID = "100";
     };
 
     environmentFiles = [
