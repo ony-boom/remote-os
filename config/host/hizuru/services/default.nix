@@ -13,5 +13,6 @@
     ./containers
 
     ./postgresql.nix
+    ./mysql.nix
   ];
 }

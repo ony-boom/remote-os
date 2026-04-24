@@ -22,9 +22,9 @@ in {
       REQUIRE_HTTPS = "false";
       TRUSTED_PROXIES = "*";
 
-      DB_CONNECTION = "pgsql";
+      DB_CONNECTION = "mysql";
       DB_HOST = "host.containers.internal";
-      DB_PORT = "5432";
+      DB_PORT = "3306";
       DB_DATABASE = "invoiceninja";
       DB_USERNAME = "invoiceninja";
 
