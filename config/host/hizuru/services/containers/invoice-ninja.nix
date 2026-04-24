@@ -11,9 +11,6 @@ in {
 
   virtualisation.oci-containers.containers.invoice-ninja = {
     image = "invoiceninja/invoiceninja:5";
-    ports = [
-      "127.0.0.1:${port}:80"
-    ];
 
     environment = {
       APP_URL = "http://localhost:${port}";
@@ -42,6 +39,29 @@ in {
 
     extraOptions = [
       "--add-host=host.containers.internal:host-gateway"
+    ];
+
+    autoStart = true;
+  };
+
+  virtualisation.oci-containers.containers.invoice-ninja-nginx = {
+    image = "invoiceninja/invoiceninja-nginx:5";
+    dependsOn = ["invoice-ninja"];
+
+    ports = [
+      "127.0.0.1:${port}:80"
+    ];
+
+    environment = {
+      INVOICENINJA_HOST = "invoice-ninja";
+    };
+
+    volumes = [
+      "/var/lib/invoice-ninja/public:/var/www/app/public:ro"
+    ];
+
+    extraOptions = [
+      "--link=invoice-ninja:invoice-ninja"
     ];
 
     autoStart = true;
