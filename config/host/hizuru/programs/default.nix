@@ -10,6 +10,15 @@
       };
     };
 
+    zsh = {
+      enableCompletion = true;
+      syntaxHighlighting.enable = true;
+
+      shellInit = ''
+        eval "$(atuin init zsh)"
+      '';
+    };
+
     starship.enable = true;
   };
 
