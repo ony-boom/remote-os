@@ -6,6 +6,9 @@ COLMENA ?= nix --accept-flake-config run .\#apps.x86_64-linux.colmena
 all:
 	$(COLMENA) apply
 
+boot:
+	$(COLMENA) apply boot
+
 ## Deploy to local machine
 local:
 	$(COLMENA) apply-local
