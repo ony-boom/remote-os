@@ -56,6 +56,12 @@ in {
       '';
     };
 
+    "ci.ony.world" = {
+      extraConfig = ''
+        reverse_proxy http://127.0.0.1:3007
+      '';
+    };
+
     "aresthegreek.work" = {
       extraConfig = ''
         redir https://aresthegreek.framer.website{uri} 302

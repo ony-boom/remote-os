@@ -9,6 +9,7 @@
     ./mmd.nix
 
     ./webhooks
+    ./woodpecker.nix
     # docker/podman containers as services
     ./containers
 
