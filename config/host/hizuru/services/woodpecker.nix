@@ -1,5 +1,5 @@
 {config, ...}: {
-  age.secrets.woodpecker.file = ../secrets/webhooks.age;
+  age.secrets.woodpecker.file = ../secrets/woodpecker.age;
   services.woodpecker-server = {
     enable = true;
     environment = {
