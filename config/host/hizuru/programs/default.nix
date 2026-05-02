@@ -14,7 +14,7 @@
       enableCompletion = true;
       syntaxHighlighting.enable = true;
 
-      shellInit = ''
+      interactiveShellInit = ''
         eval "$(atuin init zsh)"
       '';
     };
