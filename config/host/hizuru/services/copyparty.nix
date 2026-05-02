@@ -1,4 +1,6 @@
-{config, ...}: {
+{config, ...}: let
+  port = 3923;
+in {
   age.secrets.copyparty.file = ../secrets/copyparty.age;
 
   services.copyparty = {
@@ -8,7 +10,7 @@
 
     settings = {
       i = "127.0.0.1";
-      p = [3923];
+      p = [port];
       no-reload = true;
     };
 
@@ -50,6 +52,6 @@
   };
 
   services.caddy.virtualHosts."file.ony.world".extraConfig = ''
-    reverse_proxy http://127.0.0.1:3923
+    reverse_proxy http://127.0.0.1:${toString port}
   '';
 }

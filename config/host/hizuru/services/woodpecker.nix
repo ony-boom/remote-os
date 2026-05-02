@@ -6,7 +6,7 @@ in {
     enable = true;
     environment = {
       WOODPECKER_HOST = "https://ci.ony.world";
-      WOODPECKER_SERVER_ADDR = ":${serverPort}";
+      WOODPECKER_SERVER_ADDR = ":${toString serverPort}";
       WOODPECKER_OPEN = "true";
       WOODPECKER_GITHUB = "true";
     };
@@ -15,6 +15,6 @@ in {
   };
 
   services.caddy.virtualHosts."ci.ony.world".extraConfig = ''
-    reverse_proxy http://127.0.0.1:${serverPort}
+    reverse_proxy http://127.0.0.1:${toString serverPort}
   '';
 }
