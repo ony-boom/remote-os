@@ -12,7 +12,6 @@
     # docker/podman containers as services
     ./containers
 
-    ./postgresql.nix
     ./mysql.nix
   ];
 }
