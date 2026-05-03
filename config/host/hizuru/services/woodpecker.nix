@@ -84,6 +84,7 @@ in {
       DynamicUser = lib.mkForce false;
       User = deployUser;
       Group = "users";
+      ReadWritePaths = [remoteOsCheckout];
     };
     path = ["/run/wrappers" deployFlakeInput] ++ (with pkgs; [nix git git-lfs bash coreutils]);
   };
