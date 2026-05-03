@@ -85,7 +85,7 @@ in {
       User = deployUser;
       Group = "users";
     };
-    path = ["/run/wrappers"] ++ (with pkgs; [nix git git-lfs bash coreutils]);
+    path = ["/run/wrappers" deployFlakeInput] ++ (with pkgs; [nix git git-lfs bash coreutils]);
   };
 
   systemd.tmpfiles.rules = [
