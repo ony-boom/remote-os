@@ -10,13 +10,17 @@
   remoteOsCheckout = "/var/lib/remote-os";
   deployUser = "deploy";
 
-  # Bumps a flake input on remote-os, applies it, then pushes the updated lock.
-  # The agent runs as ${deployUser}, which has the GitHub-authorized SSH key and
-  # NOPASSWD sudo (used for `colmena apply-local`).
+  flakeDeployTriggerDir = "/var/lib/flake-deploy";
+  flakeDeployTrigger = "${flakeDeployTriggerDir}/trigger";
+
+  # Bumps a flake input on remote-os, pushes the updated lock, and queues a
+  # local apply via the flake-deploy.service systemd unit. The actual rebuild
+  # runs detached from this script so an activation that restarts the agent
+  # mid-run does not kill the deploy itself.
   # Usage: deploy-flake-input <input-name> [commit-sha]
   deployFlakeInput = pkgs.writeShellApplication {
     name = "deploy-flake-input";
-    runtimeInputs = with pkgs; [git nix openssh];
+    runtimeInputs = with pkgs; [git nix openssh coreutils];
     text = ''
       set -euo pipefail
 
@@ -58,9 +62,10 @@
         git pull --rebase origin main 2>&1
         git push origin main 2>&1
       fi
-      echo "==> push ok, applying with colmena..."
 
-      sudo -n nix --accept-flake-config run .\#apps.x86_64-linux.colmena apply-local
+      echo "==> queueing flake-deploy.service via ${flakeDeployTrigger}"
+      date -u +%FT%TZ > ${flakeDeployTrigger}
+      echo "==> done. Watch progress with: journalctl -u flake-deploy.service -f"
     '';
   };
 in {
@@ -101,14 +106,40 @@ in {
       User = deployUser;
       Group = "users";
       NoNewPrivileges = lib.mkForce false;
-      ReadWritePaths = [remoteOsCheckout "/home/${deployUser}/.ssh"];
+      ReadWritePaths = [remoteOsCheckout "/home/${deployUser}/.ssh" flakeDeployTriggerDir];
     };
     path = ["/run/wrappers" deployFlakeInput] ++ (with pkgs; [nix git git-lfs openssh bash coreutils]);
+  };
+
+  # Path watcher: starts flake-deploy.service whenever the trigger file is touched.
+  systemd.paths.flake-deploy = {
+    wantedBy = ["multi-user.target"];
+    pathConfig = {
+      PathChanged = flakeDeployTrigger;
+      Unit = "flake-deploy.service";
+    };
+  };
+
+  # Runs `colmena apply-local` as root, detached from the agent. Activation can
+  # restart the agent freely; this unit completes on its own.
+  systemd.services.flake-deploy = {
+    description = "Apply latest remote-os flake.lock via colmena";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      WorkingDirectory = "${remoteOsCheckout}/config";
+    };
+    path = with pkgs; [nix git];
+    script = ''
+      nix --accept-flake-config run .#apps.x86_64-linux.colmena -- apply-local
+    '';
   };
 
   systemd.tmpfiles.rules = [
     "d ${remoteOsCheckout} 0755 ${deployUser} users - -"
     "d /home/${deployUser}/.ssh 0700 ${deployUser} users - -"
+    "d ${flakeDeployTriggerDir} 0775 ${deployUser} users - -"
+    "f ${flakeDeployTrigger} 0664 ${deployUser} users - -"
   ];
 
   environment.systemPackages = [deployFlakeInput];
