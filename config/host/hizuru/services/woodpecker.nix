@@ -101,7 +101,7 @@ in {
       User = "woodpecker-agent";
       Group = "woodpecker-agent";
     };
-    path = with pkgs; [nix git bash coreutils];
+    path = with pkgs; [nix git git-lfs bash coreutils];
   };
 
   systemd.tmpfiles.rules = [
