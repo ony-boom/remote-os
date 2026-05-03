@@ -18,10 +18,6 @@
   users.users = let
     publicKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF+IhjgxWSqhWo6ER2Gw4qyRb5JS7ioJIAKRZFJaId/y ony@maki"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO8dKTSQ1na9/8WhbGVqzGKtmGAlmgWmk9Wmgerib5Gu ony@contalto.com"
-
-      # for auto-deploying
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC1M4MDbwNVI0Kaiqh2X1L/gPeUASYca0eEV9Ip0Uo/B github-actions@hizuru"
     ];
   in {
     ony = {
@@ -39,11 +35,10 @@
 
     deploy = {
       isNormalUser = true;
-      description = "GitHub Actions deployment user";
-      extraGroups = [
-        "wheel"
+      description = "Woodpecker CI deployment user";
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC1M4MDbwNVI0Kaiqh2X1L/gPeUASYca0eEV9Ip0Uo/B github-actions@hizuru"
       ];
-      openssh.authorizedKeys.keys = publicKeys;
     };
   };
 
@@ -64,7 +59,7 @@
         "nix-command"
         "flakes"
       ];
-      trusted-users = ["ony" "root"];
+      trusted-users = ["ony" "root" "deploy"];
       trusted-substituters = [
         "https://ony-boom.cachix.org"
       ];
@@ -77,13 +72,20 @@
 
   security.sudo.extraRules = [
     {
-      users = ["ony" "deploy"];
+      users = ["ony"];
       commands = [
         {
           command = "ALL";
-          options = [
-            "NOPASSWD"
-          ];
+          options = ["NOPASSWD"];
+        }
+      ];
+    }
+    {
+      users = ["deploy"];
+      commands = [
+        {
+          command = "/run/current-system/sw/bin/nix";
+          options = ["NOPASSWD" "SETENV"];
         }
       ];
     }
