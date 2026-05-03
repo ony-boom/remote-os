@@ -31,7 +31,7 @@
         exit 2
       fi
 
-      export GIT_SSH_COMMAND="ssh -i ${config.age.secrets.deploy-ssh-key.path} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/home/${deployUser}/.ssh/known_hosts"
+      export GIT_SSH_COMMAND="ssh -i ${config.age.secrets.deploy-ssh-key.path} -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/home/${deployUser}/.ssh/known_hosts"
 
       if [ ! -d ${remoteOsCheckout}/.git ]; then
         git clone ${remoteOsRepo} ${remoteOsCheckout}
@@ -41,7 +41,7 @@
       git reset --hard origin/main
 
       cd config
-      nix --accept-flake-config flake lock --update-input "$input"
+      nix --accept-flake-config flake update "$input"
 
       if git diff --quiet flake.lock; then
         echo "flake.lock unchanged for input '$input'; nothing to deploy."
@@ -51,7 +51,14 @@
       git add flake.lock
       git -c user.email=ci@ony.world -c user.name=woodpecker \
         commit -m "chore: updated $input to ''${commit:0:7}"
-      git push origin main
+
+      echo "==> pushing to origin/main..."
+      if ! git push origin main 2>&1; then
+        echo "==> push failed; pulling --rebase and retrying..."
+        git pull --rebase origin main 2>&1
+        git push origin main 2>&1
+      fi
+      echo "==> push ok, applying with colmena..."
 
       sudo -n nix --accept-flake-config run .\#apps.x86_64-linux.colmena apply-local
     '';
@@ -93,6 +100,7 @@ in {
       DynamicUser = lib.mkForce false;
       User = deployUser;
       Group = "users";
+      NoNewPrivileges = lib.mkForce false;
       ReadWritePaths = [remoteOsCheckout "/home/${deployUser}/.ssh"];
     };
     path = ["/run/wrappers" deployFlakeInput] ++ (with pkgs; [nix git git-lfs openssh bash coreutils]);
