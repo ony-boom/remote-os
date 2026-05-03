@@ -16,7 +16,7 @@
   # Usage: deploy-flake-input <input-name> [commit-sha]
   deployFlakeInput = pkgs.writeShellApplication {
     name = "deploy-flake-input";
-    runtimeInputs = with pkgs; [git nix];
+    runtimeInputs = with pkgs; [git nix openssh];
     text = ''
       set -euo pipefail
 
@@ -30,6 +30,8 @@
         echo "invalid input name: $input" >&2
         exit 2
       fi
+
+      export GIT_SSH_COMMAND="ssh -i ${config.age.secrets.deploy-ssh-key.path} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/home/${deployUser}/.ssh/known_hosts"
 
       if [ ! -d ${remoteOsCheckout}/.git ]; then
         git clone ${remoteOsRepo} ${remoteOsCheckout}
@@ -56,6 +58,13 @@
   };
 in {
   age.secrets.woodpecker.file = ../secrets/woodpecker.age;
+
+  age.secrets.deploy-ssh-key = {
+    file = ../secrets/deploy-ssh-key.age;
+    mode = "0400";
+    owner = deployUser;
+    group = "users";
+  };
 
   services.woodpecker-server = {
     enable = true;
@@ -84,13 +93,14 @@ in {
       DynamicUser = lib.mkForce false;
       User = deployUser;
       Group = "users";
-      ReadWritePaths = [remoteOsCheckout];
+      ReadWritePaths = [remoteOsCheckout "/home/${deployUser}/.ssh"];
     };
-    path = ["/run/wrappers" deployFlakeInput] ++ (with pkgs; [nix git git-lfs bash coreutils]);
+    path = ["/run/wrappers" deployFlakeInput] ++ (with pkgs; [nix git git-lfs openssh bash coreutils]);
   };
 
   systemd.tmpfiles.rules = [
     "d ${remoteOsCheckout} 0755 ${deployUser} users - -"
+    "d /home/${deployUser}/.ssh 0700 ${deployUser} users - -"
   ];
 
   environment.systemPackages = [deployFlakeInput];
