@@ -8,8 +8,7 @@
     ./filebrowser.nix
     ./mmd.nix
 
-    # ./webhooks
-    ./woodpecker.nix
+    ./webhooks
     # docker/podman containers as services
     ./containers
 
