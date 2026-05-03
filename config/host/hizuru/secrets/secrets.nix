@@ -13,5 +13,6 @@ in {
   "webhooks.age".publicKeys = hizuru ++ maki;
   "navidrome.age".publicKeys = hizuru ++ maki;
   "woodpecker.age".publicKeys = hizuru ++ maki;
-  "deploy-ssh-key.age".publicKeys = hizuru ++ maki;
+  "deploy-ssh-key.age".publicKeys = hizuru ++ maki ++ ["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHqVvf1e59DIz7rdGAShn9ZGoc6cUeEnhtDFyFsnhkqi deploy@hizuru
+"];
 }
