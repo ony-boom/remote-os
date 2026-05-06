@@ -33,12 +33,15 @@
     nixpkgs,
     disko,
     colmena,
+    self,
     ...
   } @ inputs: let
     system = "x86_64-linux";
   in {
     apps.${system}.colmena = colmena.apps.${system}.colmena;
-    colmenaHive = colmena.lib.makeHive {
+    colmenaHive = colmena.lib.makeHive self.outputs.colmena;
+
+    colmena = {
       meta = {
         nixpkgs = import nixpkgs {
           inherit system;
