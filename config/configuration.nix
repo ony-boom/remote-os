@@ -24,21 +24,17 @@
       isNormalUser = true;
       hashedPassword = "$6$74ywRZqjR0/lgpMb$Uwh2Ul9FNj/u.mLtYKPkxVUL0jEjcaVyhUZ84mFShv8gbonujR/cK2lNht0KOKJjMVZ/fVqI9XSLF910g/rNO/";
       extraGroups = ["wheel" "networkmanager"];
-      openssh.authorizedKeys.keys = publicKeys;
+      openssh.authorizedKeys.keys =
+        publicKeys
+        ++ [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5iHdYragwwtS6KdS9chikFGk0EMSO06HTM1QA3YRMi gh-@hizuru"
+        ];
 
       shell = pkgs.zsh;
     };
     root = {
       # shell = pkgs.zsh;
       openssh.authorizedKeys.keys = publicKeys;
-    };
-
-    deploy = {
-      isNormalUser = true;
-      description = "Woodpecker CI deployment user";
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC1M4MDbwNVI0Kaiqh2X1L/gPeUASYca0eEV9Ip0Uo/B github-actions@hizuru"
-      ];
     };
   };
 
