@@ -49,11 +49,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1777069669,
-        "narHash": "sha256-cEyV6jpC7pX/TNoHI+VDiTDjQc0rfYAkDLRJP2hZrzc=",
+        "lastModified": 1777744353,
+        "narHash": "sha256-8UmzMm5wkq+z0kEMEjowoECa4qY813z747o0g+G/bbE=",
         "owner": "9001",
         "repo": "copyparty",
-        "rev": "6e25d648a900f65a4546a1b17a9761c0f1e9e3cb",
+        "rev": "da6e2ddca96dffc4dbe53bda25d2034428fad3d0",
         "type": "github"
       },
       "original": {
@@ -276,11 +276,11 @@
     },
     "nixpkgs_5": {
       "locked": {
-        "lastModified": 1777578337,
-        "narHash": "sha256-Ad49moKWeXtKBJNy2ebiTQUEgdLyvGmTeykAQ9xM+Z4=",
+        "lastModified": 1777954456,
+        "narHash": "sha256-hGdgeU2Nk87RAuZyYjyDjFL6LK7dAZN5RE9+hrDTkDU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
         "type": "github"
       },
       "original": {
@@ -312,11 +312,11 @@
         "systems": "systems_3"
       },
       "locked": {
-        "lastModified": 1777826774,
-        "narHash": "sha256-GxW9aqOtCReQ7w8pNZfxhNYZE3CAglg0W+QuZZTpJ5g=",
+        "lastModified": 1778004198,
+        "narHash": "sha256-km5nxcuEoZB61ZuyU0ofBcIePIJoLX2VWOETQvtECWQ=",
         "owner": "ony-boom",
         "repo": "ony.world",
-        "rev": "71570a8d92b79ab6c8c3cb063274b16b733f7ee4",
+        "rev": "51c3ab1bcb3d8f622746f5a1393951a53980a38c",
         "type": "github"
       },
       "original": {
