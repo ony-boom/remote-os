@@ -56,10 +56,10 @@
         "flakes"
       ];
       trusted-users = ["ony" "root" "deploy"];
-      trusted-substituters = [
+      extra-substituters = [
         "https://ony-boom.cachix.org"
       ];
-      trusted-public-keys = [
+      extra-trusted-public-keys = [
         "ony-boom.cachix.org-1:rPOTyyOCiAhLarertCrNnZLxsBFpcirEekoohcCZt10="
       ];
       download-buffer-size = 524288000;
