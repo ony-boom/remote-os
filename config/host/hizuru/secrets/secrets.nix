@@ -12,4 +12,5 @@ in {
   "umami.age".publicKeys = hizuru ++ maki;
   "webhooks.age".publicKeys = hizuru ++ maki;
   "navidrome.age".publicKeys = hizuru ++ maki;
+  "couchdb.age".publicKeys = hizuru ++ maki;
 }
