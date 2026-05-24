@@ -58,9 +58,17 @@
       trusted-users = ["ony" "root" "deploy"];
       extra-substituters = [
         "https://ony-boom.cachix.org"
+        # Caches maki needs hizuru to substitute from when building maki's
+        # closure via `nixos-rebuild --build-host`.
+        "https://nix-community.cachix.org"
+        "https://fenix.cachix.org"
+        "https://cuda-maintainers.cachix.org"
       ];
       extra-trusted-public-keys = [
         "ony-boom.cachix.org-1:rPOTyyOCiAhLarertCrNnZLxsBFpcirEekoohcCZt10="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "fenix.cachix.org-1:ecJhr+RdYEdcVgUkjruiYhjbBloIEGov7bos90cZi0Q="
+        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
       ];
       download-buffer-size = 524288000;
     };
