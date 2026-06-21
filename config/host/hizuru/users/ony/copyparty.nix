@@ -1,7 +1,7 @@
 {config, ...}: let
   port = 3923;
 in {
-  age.secrets.copyparty.file = ../secrets/copyparty.age;
+  age.secrets.copyparty.file = ./secrets/copyparty.age;
 
   services.copyparty = {
     enable = true;

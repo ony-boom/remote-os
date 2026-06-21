@@ -8,7 +8,7 @@
     source = ./config;
   };
 
-  age.secrets.webhooks.file = ../../secrets/webhooks.age;
+  age.secrets.webhooks.file = ../secrets/webhooks.age;
 
   systemd.services.webhooks = {
     description = "Hizuru's webhooks listener";

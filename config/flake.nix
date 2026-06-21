@@ -15,6 +15,11 @@
 
     copyparty.url = "github:9001/copyparty";
     agenix.url = "github:ryantm/agenix";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {

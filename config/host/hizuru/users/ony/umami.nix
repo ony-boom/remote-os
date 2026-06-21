@@ -1,7 +1,7 @@
 {config, ...}: let
   umami-settings = config.services.umami.settings;
 in {
-  age.secrets.umami.file = ../secrets/umami.age;
+  age.secrets.umami.file = ./secrets/umami.age;
 
   services.umami = {
     enable = true;

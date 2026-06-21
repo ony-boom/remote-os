@@ -1,7 +1,7 @@
 {config, ...}: let
   port = "5984";
 in {
-  age.secrets.couchdb.file = ../../secrets/couchdb.age;
+  age.secrets.couchdb.file = ../secrets/couchdb.age;
 
   virtualisation.oci-containers.containers.couchdb = {
     image = "couchdb:3";

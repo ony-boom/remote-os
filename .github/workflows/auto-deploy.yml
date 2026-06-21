@@ -61,6 +61,9 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          # targetUser is null in the flake, so pin the deploy account here.
+          printf 'Host %s\n  User ony\n' "${{ secrets.VPS_HOST }}" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
 
       - name: Deploy with Colmena
         run: make

@@ -5,7 +5,9 @@
 }: {
   deployment = {
     targetPort = 22;
-    targetUser = "ony";
+    # null = connect as whoever runs colmena (ony, titosy, ...), each with
+    # their own account + key. CI pins `User ony` via ssh config.
+    targetUser = null;
     targetHost = "94.250.201.16";
 
     buildOnTarget = true;
