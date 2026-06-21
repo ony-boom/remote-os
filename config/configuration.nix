@@ -19,19 +19,32 @@
     publicKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF+IhjgxWSqhWo6ER2Gw4qyRb5JS7ioJIAKRZFJaId/y ony@maki"
     ];
-  in {
-    ony = {
+    baseUser = {
       isNormalUser = true;
-      hashedPassword = "$6$74ywRZqjR0/lgpMb$Uwh2Ul9FNj/u.mLtYKPkxVUL0jEjcaVyhUZ84mFShv8gbonujR/cK2lNht0KOKJjMVZ/fVqI9XSLF910g/rNO/";
       extraGroups = ["wheel" "networkmanager"];
-      openssh.authorizedKeys.keys =
-        publicKeys
-        ++ [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5iHdYragwwtS6KdS9chikFGk0EMSO06HTM1QA3YRMi gh-@hizuru"
-        ];
-
       shell = pkgs.zsh;
     };
+  in {
+    ony =
+      baseUser
+      // {
+        hashedPassword = "$6$74ywRZqjR0/lgpMb$Uwh2Ul9FNj/u.mLtYKPkxVUL0jEjcaVyhUZ84mFShv8gbonujR/cK2lNht0KOKJjMVZ/fVqI9XSLF910g/rNO/";
+        openssh.authorizedKeys.keys =
+          publicKeys
+          ++ [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5iHdYragwwtS6KdS9chikFGk0EMSO06HTM1QA3YRMi gh-@hizuru"
+          ];
+      };
+    titosy =
+      baseUser
+      // {
+        hashedPassword = "$6$rlEnH.9.J8fi1Kw2$o1MRrZoQxrQmRf2u2bXXLYLeygY815stnZY7zbsTTexQQmgJFwfM5SuP0LACWL0sj.T./JtAoSVdPRSOATXSS0";
+        openssh.authorizedKeys.keys =
+          publicKeys
+          ++ [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINfA9T74URZ3QKWGC1guq6+WJmhCqRh0LXQ1HeFJ6O4f dev.titosy@gmail.com"
+          ];
+      };
     root = {
       # shell = pkgs.zsh;
       openssh.authorizedKeys.keys = publicKeys;
