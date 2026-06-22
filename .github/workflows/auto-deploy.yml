@@ -70,4 +70,6 @@ jobs:
 
       - name: Push flake.lock
         if: success()
-        run: git push origin HEAD:${{ github.ref_name }}
+        run: |
+          git pull --rebase origin ${{ github.ref_name }}
+          git push origin HEAD:${{ github.ref_name }}
