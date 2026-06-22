@@ -5,6 +5,7 @@
     ./disk-config.nix
     ./services
     ./users/ony
+    ./users/titosy
   ];
 
   boot.kernel.sysctl = {
