@@ -8,7 +8,6 @@
     ./filebrowser.nix
     ./umami.nix
     ./mysql.nix
-    ./webhooks
     ./containers
     ./mounts.nix
   ];

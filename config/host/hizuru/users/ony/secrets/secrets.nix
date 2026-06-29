@@ -11,7 +11,6 @@ let
 in {
   "copyparty.age".publicKeys = keys;
   "umami.age".publicKeys = keys;
-  "webhooks.age".publicKeys = keys;
   "navidrome.age".publicKeys = keys;
   "couchdb.age".publicKeys = keys;
 }
