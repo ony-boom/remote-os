@@ -1,5 +1,5 @@
 {config, ...}: let
-  port = "7080";
+  port = "9000"; # php-fpm; this image ships no web server, Caddy serves public/.
   # Host MariaDB (see ../mysql.nix) reached from the container over the
   # docker0 bridge. mysql.nix binds 0.0.0.0 and opens docker0:3306.
   dbHost = "172.17.0.1";
@@ -26,7 +26,7 @@ in {
       QUEUE_CONNECTION = "sync"; # ponytail: no worker; switch to redis if queues get heavy.
     };
     environmentFiles = [config.age.secrets.invoice-ninja.path];
-    ports = ["127.0.0.1:${port}:80"];
+    ports = ["127.0.0.1:${port}:9000"];
     volumes = [
       "/var/lib/invoice-ninja/public:/var/www/html/public"
       "/var/lib/invoice-ninja/storage:/var/www/html/storage"
@@ -51,7 +51,24 @@ in {
     '';
   };
 
+  # Serve the app's public/ dir (populated into the volume on first boot) and
+  # hand .php to php-fpm in the container. root inside php_fastcgi is the
+  # container-side path so SCRIPT_FILENAME resolves there, not on the host.
+  # /storage/* (logos, uploads) is a symlink in public/ that points at the
+  # container path, so it dangles on the host — serve it from the real storage
+  # volume instead. Everything else: public/ static files + php-fpm.
   services.caddy.virtualHosts."invoicing.ony.world".extraConfig = ''
-    reverse_proxy http://127.0.0.1:${port}
+    handle_path /storage/* {
+      root * /var/lib/invoice-ninja/storage/app/public
+      file_server
+    }
+    handle {
+      root * /var/lib/invoice-ninja/public
+      php_fastcgi 127.0.0.1:${port} {
+        root /var/www/html/public
+      }
+      file_server
+    }
+    encode zstd gzip
   '';
 }
