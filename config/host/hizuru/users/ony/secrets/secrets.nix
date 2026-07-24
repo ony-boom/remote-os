@@ -13,4 +13,5 @@ in {
   "umami.age".publicKeys = keys;
   "navidrome.age".publicKeys = keys;
   "couchdb.age".publicKeys = keys;
+  "invoice-ninja.age".publicKeys = keys;
 }
