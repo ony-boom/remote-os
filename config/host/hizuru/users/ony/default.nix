@@ -7,6 +7,7 @@
     ./navidrome.nix
     ./filebrowser.nix
     ./umami.nix
+    ./languagetool.nix
     ./mysql.nix
     ./containers
     ./mounts.nix

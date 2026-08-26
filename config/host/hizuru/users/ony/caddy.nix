@@ -1,10 +1,15 @@
 {
+  config,
   inputs,
   pkgs,
   ...
 }: let
   ony-world = inputs.ony-world.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in {
+  # Caddyfile env vars ({$VAR}), decrypted by agenix; shared by every vhost.
+  age.secrets.caddy.file = ./secrets/caddy.age;
+  services.caddy.environmentFile = config.age.secrets.caddy.path;
+
   services.caddy.virtualHosts = {
     "ony.world" = {
       extraConfig = ''
