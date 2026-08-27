@@ -14,7 +14,9 @@
       maxCheckTimeMillis = 30000;
     };
 
-    jvmOptions = ["-Xmx512m"];
+    # LT 6.6 peaked at 1G RSS against a 512m heap and OOM-killed itself under
+    # picky/text-level French checks; hizuru has ~8.5G free, so give it room.
+    jvmOptions = ["-Xmx3g" "-Xms512m"];
   };
 
   # Two mutually exclusive handlers. Order matters: at the top level basic_auth
