@@ -9,7 +9,7 @@ let
 
   keys = host ++ ony;
 in {
-  "copyparty.age".publicKeys = keys;
+  "garage.age".publicKeys = keys;
   "umami.age".publicKeys = keys;
   "navidrome.age".publicKeys = keys;
   "couchdb.age".publicKeys = keys;

@@ -3,7 +3,7 @@
 {
   imports = [
     ./caddy.nix
-    ./copyparty.nix
+    ./garage.nix
     ./navidrome.nix
     ./filebrowser.nix
     ./umami.nix

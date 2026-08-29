@@ -13,7 +13,6 @@
       url = "github:zhaofengli/colmena";
     };
 
-    copyparty.url = "github:9001/copyparty";
     agenix.url = "github:ryantm/agenix";
 
     home-manager = {
