@@ -43,10 +43,14 @@ in {
   services.caddy.virtualHosts = {
     # Sveltia CMS uploads from the browser, so the S3 API needs CORS.
     "s3.ony.world".extraConfig = ''
+      header {
+        Access-Control-Allow-Origin "${cmsOrigin}"
+        Access-Control-Expose-Headers "ETag"
+      }
+
       @preflight method OPTIONS
       handle @preflight {
         header {
-          Access-Control-Allow-Origin "${cmsOrigin}"
           Access-Control-Allow-Methods "GET, PUT, HEAD, OPTIONS"
           Access-Control-Allow-Headers "authorization, content-type, x-amz-date, x-amz-content-sha256, x-amz-acl, x-amz-user-agent"
           Access-Control-Max-Age "86400"
@@ -54,17 +58,13 @@ in {
         respond 204
       }
 
-      handle {
-        header {
-          Access-Control-Allow-Origin "${cmsOrigin}"
-          Access-Control-Expose-Headers "ETag"
-        }
-        reverse_proxy http://127.0.0.1:${toString s3Port}
-      }
+      reverse_proxy http://127.0.0.1:${toString s3Port}
     '';
 
+    # Cross-origin CMS previews; the bucket is public read-only anyway.
     "media.ony.world".extraConfig = ''
       encode zstd gzip
+      header Access-Control-Allow-Origin "*"
       reverse_proxy http://127.0.0.1:${toString webPort}
     '';
   };
