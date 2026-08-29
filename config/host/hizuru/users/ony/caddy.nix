@@ -42,6 +42,24 @@ in {
       '';
     };
 
+    # Sveltia CMS: a static SPA shipped in the ony-world package, served from
+    # its own root so /admin doesn't exist on the site. It holds no authority
+    # of its own — GitHub decides who can write to the repo — so basic_auth is
+    # here to keep crawlers and randoms off the page, not as the real boundary.
+    # CMS_BASIC_USER/CMS_BASIC_HASH come from the caddy.age secret.
+    "cms.ony.world" = {
+      extraConfig = ''
+        basic_auth {
+          {$CMS_BASIC_USER} {$CMS_BASIC_HASH}
+        }
+
+        root * ${ony-world}/var/www/cms.ony.world
+
+        encode zstd gzip
+        file_server
+      '';
+    };
+
     "aresthegreek.work" = {
       extraConfig = ''
         redir https://aresthegreek.framer.website{uri} 302
