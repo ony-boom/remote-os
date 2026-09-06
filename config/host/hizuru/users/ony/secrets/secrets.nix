@@ -10,6 +10,10 @@ let
   keys = host ++ ony;
 in {
   "garage.age".publicKeys = keys;
+  # Raw token only (openssl rand -hex 32), NOT KEY=value: aria2 reads it via
+  # LoadCredential and appends it to its own conf.
+  "aria2.age".publicKeys = keys;
+  "jdownloader.age".publicKeys = keys;
   "umami.age".publicKeys = keys;
   "navidrome.age".publicKeys = keys;
   "couchdb.age".publicKeys = keys;
