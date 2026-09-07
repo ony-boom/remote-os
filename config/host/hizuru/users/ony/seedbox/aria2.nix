@@ -61,7 +61,7 @@ in {
 
   services.tailscaleServe."${toString uiPort}".target = "http://127.0.0.1:${toString uiPort}";
 
-  # Bound to 127.0.0.1, so this needs no firewall rule and is not reachable from
+  # Bound to loopback, so this needs no firewall rule and is not reachable from
   # the public interface at all. AriaNg is served at / rather than under a path:
   # its index.html has no <base href> and uses relative asset paths, so a
   # stripped prefix breaks it. Serving the UI and proxying the RPC from one
@@ -69,7 +69,14 @@ in {
   #
   # AriaNg does not discover the RPC secret - it lives in browser localStorage.
   # Seed it once with the path-style quick-setup route; see seedbox.md.
-  services.caddy.virtualHosts."127.0.0.1:${toString uiPort}".extraConfig = ''
+  services.caddy.virtualHosts."http://:${toString uiPort}".extraConfig = ''
+    # http:// and an explicit bind, both load-bearing. A site address of
+    # "127.0.0.1:7081" makes caddy turn on automatic HTTPS with an internal cert
+    # for that port, and tailscaled forwards plain http - which lands as a 400.
+    # The scheme prefix keeps it plain http; bind is what actually restricts the
+    # listener, since the host in a site address only matches, it does not bind.
+    bind 127.0.0.1
+
     handle /jsonrpc* {
       reverse_proxy http://127.0.0.1:${toString rpcPort}
     }
