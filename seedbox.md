@@ -85,11 +85,30 @@ cd config && make
 
 ## AriaNg
 
-AriaNg keeps the RPC secret in browser localStorage — it is not discovered. Seed it
-once with the quick-setup route:
+AriaNg keeps its RPC settings in browser localStorage, so this is once per
+browser. Out of the box it points at `rpcHost: ""` / port 6800, which means *your*
+machine, not hizuru — until it is configured it shows a "cannot connect" popup.
+
+Settings -> RPC, or the quick-setup URL below:
+
+| Field    | Value                        |
+| -------- | ---------------------------- |
+| Protocol | HTTPS                        |
+| Host     | `hizuru.tempel-goblin.ts.net` |
+| Port     | `7081`                       |
+| Path     | `jsonrpc`                    |
+| Secret   | the raw token, unencoded     |
 
 ```sh
-agenix -d aria2.age | tr -d '\n' | base64 -w0    # the <token> below
+agenix -d aria2.age                # raw token, for the settings form
+```
+
+The URL form wants the secret **base64url** encoded, not plain base64: AriaNg runs
+it through `base64UrlDecode`, and standard base64 can emit `+`, `/` and `=` - a `/`
+breaks the URL path, and the rest trips "RPC secret is not base64 encoded!".
+
+```sh
+agenix -d aria2.age | tr -d '\n' | base64 -w0 | tr '+/' '-_' | tr -d '='
 ```
 
 ```
