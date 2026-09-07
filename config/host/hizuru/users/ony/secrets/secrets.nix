@@ -5,6 +5,7 @@ let
   ony = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHHv9QaJuLjfAa2M6VFvfPOq8jAwfbI7JZmf8zpmFAob ony@hizuru"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF+IhjgxWSqhWo6ER2Gw4qyRb5JS7ioJIAKRZFJaId/y ony@maki"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKjyuOBLxiytzIYv/3cKhvBgH/W+GspRDcQgPJlJV3jN ony.rakotonirina@fluentech-group.com"
   ];
 
   keys = host ++ ony;

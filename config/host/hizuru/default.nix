@@ -1,6 +1,5 @@
 {
   disko,
-  inputs,
   ...
 }: {
   deployment = {
