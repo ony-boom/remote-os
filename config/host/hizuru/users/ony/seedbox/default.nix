@@ -31,12 +31,17 @@ in {
       Type = "oneshot";
       RemainAfterExit = true;
     };
-    # fallocate, not truncate: the 50G is reserved for real, so the cap holds in
-    # both directions. tmp + rename: a crash mid-mkfs leaves no ${img}, so the
-    # ConditionPathExists above can't latch a half-made image forever.
+    # truncate, not fallocate: the image is sparse, so it costs only what is
+    # actually stored and 50G is a ceiling rather than a reservation. hizuru has
+    # ~87G free and other services share it, so reserving up front is not worth
+    # it. The trade: if the host fills from elsewhere, writes inside the image
+    # fail as I/O errors rather than a clean ENOSPC.
+    #
+    # tmp + rename: a crash mid-mkfs leaves no image, so the ConditionPathExists
+    # above cannot latch a half-made one forever.
     script = ''
       rm -f ${img}.tmp
-      fallocate -l 50G ${img}.tmp
+      truncate -s 50G ${img}.tmp
       mkfs.ext4 -F -m 0 -L seedbox ${img}.tmp
       mv ${img}.tmp ${img}
     '';
@@ -50,7 +55,9 @@ in {
       what = img;
       where = root;
       type = "ext4";
-      options = "loop,noatime,nodev,nosuid,noexec";
+      # discard so deleting a download returns the blocks to the host; without
+      # it a sparse image only ever grows.
+      options = "loop,discard,noatime,nodev,nosuid,noexec";
       # mountToUnit supplies no default; without this the unit exists but never
       # starts.
       wantedBy = ["multi-user.target"];

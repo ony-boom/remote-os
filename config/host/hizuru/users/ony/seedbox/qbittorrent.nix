@@ -1,4 +1,14 @@
-# Torrents. Bound to loopback, gated by caddy's basic_auth at qb.ony.world.
+# Torrents. Nothing but the BitTorrent port is public.
+#
+# The web UI is reached over the tailnet with `tailscale serve` (see seedbox.md),
+# which is already how filebrowser, deemix and navidrome are published on this
+# box. That keeps qBittorrent on loopback, needs no firewall rule, and gets a
+# real cert for hizuru.tempel-goblin.ts.net.
+#
+# Deliberately not a public vhost: the web UI can run an external program when a
+# torrent finishes, so whoever gets past the front door gets command execution as
+# the qbittorrent user - too much to hang on one basic_auth. The tailnet is
+# device-level WireGuard keys instead, and mobile clients need no token hack.
 {pkgs, ...}: let
   # 8080 is filebrowser's default (../filebrowser.nix).
   webuiPort = 8090;
@@ -23,8 +33,8 @@ in {
 
     # Written to qBittorrent.conf by an ExecStartPre `install` on every start, so
     # changes made in the web UI do not survive a restart - including the WebUI
-    # password. That's fine here: LocalHostAuth is off and caddy's basic_auth is
-    # the real boundary.
+    # password. That's fine here: nothing authenticates at this layer, the
+    # tailnet does.
     serverConfig = {
       LegalNotice.Accepted = true;
 
@@ -34,7 +44,7 @@ in {
         Address = "127.0.0.1";
         Port = webuiPort;
 
-        # caddy authenticates; qBittorrent trusts its loopback caller.
+        # tailscaled proxies from 127.0.0.1, so the bypass still applies.
         LocalHostAuth = false;
         AuthSubnetWhitelistEnabled = true;
         AuthSubnetWhitelist = "127.0.0.1/32";
@@ -70,30 +80,11 @@ in {
     requires = ["seedbox-dirs.service"];
   };
 
+  services.tailscaleServe."8090".target = "http://localhost:8090";
+
   networking.firewall = {
+    # BitTorrent is the only part of this that faces the internet.
     allowedTCPPorts = [torrentingPort];
     allowedUDPPorts = [torrentingPort];
   };
-
-  # Same two-handler shape as ../languagetool.nix, and for the same reason:
-  # caddy runs basic_auth before handle/handle_path, so a top-level basic_auth
-  # would gate the token path too.
-  services.caddy.virtualHosts."qb.ony.world".extraConfig = ''
-    # Escape hatch for mobile clients that can't send basic auth; point them at
-    # https://qb.ony.world/{$SEEDBOX_PATH_TOKEN}. handle_path strips the prefix,
-    # so VueTorrent's absolute /assets/* still 401s - this is an API-only door.
-    # With LocalHostAuth off the token is the ONLY boundary, same threat model as
-    # LT_PATH_TOKEN.
-    handle_path /{$SEEDBOX_PATH_TOKEN}/* {
-      reverse_proxy http://127.0.0.1:${toString webuiPort}
-    }
-
-    handle {
-      basic_auth {
-        {$SEEDBOX_BASIC_USER} {$SEEDBOX_BASIC_HASH}
-      }
-
-      reverse_proxy http://127.0.0.1:${toString webuiPort}
-    }
-  '';
 }

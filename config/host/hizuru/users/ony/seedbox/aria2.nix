@@ -1,10 +1,16 @@
 # Direct HTTP/FTP links: paste a URL, hizuru pulls it with parallel connections.
+#
+# aria2's RPC and the AriaNg UI both stay on loopback; `tailscale serve`
+# publishes the UI to the tailnet (see seedbox.md), the same way filebrowser,
+# deemix and navidrome are already published on this box.
 {
   config,
   pkgs,
   ...
 }: let
   rpcPort = 6800;
+  # AriaNg plus the RPC proxy, bound to loopback for tailscale serve to pick up.
+  uiPort = 7081;
 in {
   age.secrets.aria2.file = ../secrets/aria2.age;
 
@@ -26,7 +32,8 @@ in {
     settings = {
       dir = "/srv/seedbox/http";
       rpc-listen-port = rpcPort;
-      # rpc-listen-all defaults to false, so this stays on loopback.
+      # rpc-listen-all defaults to false, so this stays on loopback and caddy is
+      # the only thing that reaches it.
 
       # HTTP/FTP only; torrents are qBittorrent's job and DHT here would just
       # fight it for ports.
@@ -52,21 +59,17 @@ in {
 
   users.users.ony.extraGroups = ["aria2"];
 
-  # AriaNg gets its own vhost rather than a path on dl.ony.world: its index.html
-  # has no <base href> and uses relative asset paths, and /jsonrpc would be
-  # shadowed the moment a download is named "jsonrpc". Same origin also means no
-  # CORS and no rpc-allow-origin-all.
+  services.tailscaleServe."${toString uiPort}".target = "http://127.0.0.1:${toString uiPort}";
+
+  # Bound to 127.0.0.1, so this needs no firewall rule and is not reachable from
+  # the public interface at all. AriaNg is served at / rather than under a path:
+  # its index.html has no <base href> and uses relative asset paths, so a
+  # stripped prefix breaks it. Serving the UI and proxying the RPC from one
+  # origin also means no CORS and no rpc-allow-origin-all.
   #
   # AriaNg does not discover the RPC secret - it lives in browser localStorage.
-  # Seed it once with the path-style quick-setup route (https, NOT wss: browsers
-  # don't attach cached basic-auth credentials to WebSocket handshakes, so wss
-  # 401s behind basic_auth):
-  #   https://aria.ony.world/#!/settings/rpc/set/https/aria.ony.world/443/jsonrpc/<base64-of-token>
-  services.caddy.virtualHosts."aria.ony.world".extraConfig = ''
-    basic_auth {
-      {$SEEDBOX_BASIC_USER} {$SEEDBOX_BASIC_HASH}
-    }
-
+  # Seed it once with the path-style quick-setup route; see seedbox.md.
+  services.caddy.virtualHosts."127.0.0.1:${toString uiPort}".extraConfig = ''
     handle /jsonrpc* {
       reverse_proxy http://127.0.0.1:${toString rpcPort}
     }

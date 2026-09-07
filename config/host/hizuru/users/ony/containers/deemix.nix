@@ -18,4 +18,6 @@ in {
     ];
     autoStart = true;
   };
+
+  services.tailscaleServe."6595".target = "http://127.0.0.1:6595";
 }

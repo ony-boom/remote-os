@@ -8,27 +8,49 @@ nothing unrestricts premium hoster links. What it does is download unattended at
 datacenter speed from slow seeds and flaky links, then hand you a fast, resumable
 HTTPS link.
 
-| Host              | Port | Component    | Auth                        |
-| ----------------- | ---- | ------------ | --------------------------- |
-| `dl.ony.world`    | -    | caddy files  | basic                       |
-| `qb.ony.world`    | 8090 | qBittorrent  | basic, + path-token bypass  |
-| `aria.ony.world`  | 6800 | aria2/AriaNg | basic                       |
-| `jd.ony.world`    | 5800 | JDownloader  | the container's own         |
+## What is exposed
 
-Everything downloads onto a 50G ext4 loop image at `/var/lib/seedbox.img`, mounted
-at `/srv/seedbox`. The root LV claims `100%FREE`, so there are no extents for a new
-LV and ext4 can't shrink online — an image file is the only cap that holds by
-construction on a box we only reach over SSH. `dl.ony.world` serves that tree
-directly, so nothing is ever copied twice.
+Only the files are public. Everything with a control surface is tailnet-only,
+published with `tailscale serve` — see [tailscale.md](tailscale.md).
 
-`jd.ony.world` deliberately has no `basic_auth`: noVNC talks over a WebSocket and
-browsers don't reliably attach cached basic-auth credentials to a WS handshake, so
-the gate would 401 the console while looking like it worked. `WEB_AUTHENTICATION`
-in the container is the real boundary there.
+| Reached at                                | Component    | Auth                |
+| ----------------------------------------- | ------------ | ------------------- |
+| `https://dl.ony.world`                    | caddy files  | basic, public       |
+| `https://hizuru.tempel-goblin.ts.net:8090` | qBittorrent  | tailnet             |
+| `https://hizuru.tempel-goblin.ts.net:7081` | aria2/AriaNg | tailnet + RPC token |
+| `https://hizuru.tempel-goblin.ts.net:5800` | JDownloader  | tailnet + its login |
+
+The public firewall gains exactly one port, `51413` for BitTorrent. qBittorrent,
+aria2 and JDownloader all stay bound to `127.0.0.1`; tailscaled is what reaches
+them, which is also why no `firewall.interfaces.tailscale0` rule is needed.
+
+qBittorrent is deliberately not on a public vhost: its web UI can run an external
+program when a torrent finishes, so whoever gets past the front door gets command
+execution as the `qbittorrent` user. The tailnet is device-level WireGuard keys
+rather than one password, and mobile clients need no token-path hack for it.
 
 qBittorrent seeds, which publishes hizuru's IP to swarms and makes the VPS
 provider's abuse contact the address of record for any notice. aria2 and
 JDownloader only pull. Nothing here masks that; there is no VPN on this host.
+
+## Storage
+
+Everything downloads onto a **sparse** 50G ext4 image at `/var/lib/seedbox.img`,
+mounted at `/srv/seedbox`. The root LV claims `100%FREE` and ext4 cannot shrink
+online, so an image file is the only way to cap this on a box we only reach over
+SSH.
+
+The image is created with `truncate`, not `fallocate`: 50G is a **ceiling, not a
+reservation**, and the file only costs what is actually stored. hizuru has ~87G
+free of 196G and other services share it, so reserving up front would eat most of
+the headroom. The mount carries `discard`, so deleting a download returns the
+blocks to the host rather than letting the image only ever grow.
+
+The trade for going sparse: if the host fills up from elsewhere, writes inside the
+image fail as I/O errors rather than a clean ENOSPC. `df -h /` is the thing to
+watch, not `df -h /srv/seedbox`.
+
+`dl.ony.world` serves that tree directly, so nothing is ever copied twice.
 
 ## Bootstrap
 
@@ -37,22 +59,18 @@ deploy — caddy does HTTP-01/TLS-ALPN with no DNS challenge configured, so cert
 issuance fails on a missing record.
 
 ```sh
-# 1. A records -> 94.250.201.16, by hand at the registrar:
-#      dl.ony.world  qb.ony.world  aria.ony.world  jd.ony.world
+# 1. One A record -> 94.250.201.16, by hand at the registrar:
+#      dl.ony.world
 ```
 
 ```sh
-# 2. On maki: the basic-auth pair and the token, appended to the shared caddy env
-# file. SEEDBOX_PATH_TOKEN is the only thing guarding qBittorrent's API for
-# clients that can't send basic auth, so give it real entropy.
+# 2. The basic-auth pair for dl.ony.world, appended to the shared caddy env file.
 nix run nixpkgs#caddy -- hash-password        # -> SEEDBOX_BASIC_HASH
-openssl rand -hex 24                          # -> SEEDBOX_PATH_TOKEN
 
 cd config/host/hizuru/users/ony/secrets
 agenix -e caddy.age
 #   SEEDBOX_BASIC_USER=...
 #   SEEDBOX_BASIC_HASH=...
-#   SEEDBOX_PATH_TOKEN=...
 ```
 
 `aria2.age` (raw token, no `KEY=`) and `jdownloader.age`
@@ -61,28 +79,25 @@ generated values. Read them back with `agenix -d <file>.age`, or replace them wi
 `agenix -e <file>.age`.
 
 ```sh
-# 3. Deploy.
+# 3. Deploy. The tailscale serve mappings apply themselves; nothing manual.
 cd config && make
 ```
 
 ## AriaNg
 
 AriaNg keeps the RPC secret in browser localStorage — it is not discovered. Seed it
-once with the quick-setup route. Use `https`, not `wss`: browsers don't attach
-cached basic-auth credentials to WebSocket handshakes, so `wss` 401s behind
-`basic_auth`.
+once with the quick-setup route:
 
 ```sh
-agenix -d aria2.age | base64 -w0    # the <token> below
+agenix -d aria2.age | tr -d '\n' | base64 -w0    # the <token> below
 ```
 
 ```
-https://aria.ony.world/#!/settings/rpc/set/https/aria.ony.world/443/jsonrpc/<token>
+https://hizuru.tempel-goblin.ts.net:7081/#!/settings/rpc/set/https/hizuru.tempel-goblin.ts.net/7081/jsonrpc/<token>
 ```
 
 ## Mobile torrent clients
 
-qBitControl and Transdroid can't send basic auth, so point them at the token path
-instead — base URL `https://qb.ony.world/<SEEDBOX_PATH_TOKEN>`. That door is
-API-only: `handle_path` strips the prefix, so VueTorrent's absolute `/assets/*`
-still 401s and the web UI won't load through it.
+Point qBitControl or Transdroid at `https://hizuru.tempel-goblin.ts.net:8090` with
+Tailscale running on the phone. No credentials: qBittorrent's `LocalHostAuth` is
+off and tailscaled reaches it from loopback, so the tailnet is the authentication.

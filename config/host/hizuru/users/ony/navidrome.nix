@@ -8,4 +8,12 @@
       MusicFolder = "/media/music";
     };
   };
+
+  # Funnel, not plain serve: this one is reachable from the public internet, so
+  # navidrome's own login is the only thing guarding it. Set funnel = false to
+  # pull it back behind the tailnet.
+  services.tailscaleServe."4533" = {
+    target = "http://localhost:4533";
+    funnel = true;
+  };
 }
