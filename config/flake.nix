@@ -41,7 +41,10 @@
   } @ inputs: let
     system = "x86_64-linux";
   in {
-    apps.${system}.colmena = colmena.apps.${system}.colmena;
+    apps.${system}.colmena = {
+      type = "app";
+      program = "${colmena.packages.${system}.colmena}/bin/colmena";
+    };
     colmenaHive = colmena.lib.makeHive self.outputs.colmena;
 
     colmena = {
