@@ -1,7 +1,6 @@
 {pkgs, ...}: let
   onyKeys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF+IhjgxWSqhWo6ER2Gw4qyRb5JS7ioJIAKRZFJaId/y ony@maki"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKjyuOBLxiytzIYv/3cKhvBgH/W+GspRDcQgPJlJV3jN ony.rakotonirina@fluentech-group.com"
   ];
 in {
   users.users.ony = {

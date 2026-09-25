@@ -5,7 +5,7 @@
     ./caddy.nix
     ./garage.nix
     ./navidrome.nix
-    ./seedbox
+    ./vaultwarden.nix
     ./filebrowser.nix
     ./umami.nix
     ./languagetool.nix
