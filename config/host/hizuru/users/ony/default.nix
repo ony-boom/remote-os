@@ -4,6 +4,8 @@
     ./caddy.nix
     ./garage.nix
     ./navidrome.nix
+    ./lidarr.nix
+    ./slskd.nix
     ./vaultwarden.nix
     ./filebrowser.nix
     ./umami.nix

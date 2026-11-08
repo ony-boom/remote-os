@@ -11,6 +11,8 @@
   services = {
     navidrome = config.services.navidrome.settings.Port;
     filebrowser = config.services.filebrowser.settings.port;
+    lidarr = config.services.lidarr.settings.server.port;
+    slskd = config.services.slskd.settings.web.port;
   };
 in {
   services.tailscale = {
@@ -49,7 +51,11 @@ in {
 
       # Start from empty so this list stays the source of truth.
       tailscale serve reset
-      ${lib.concatLines (lib.mapAttrsToList (name: port: "tailscale serve --service=svc:${name} --https=443 --bg --yes http://127.0.0.1:${toString port}") services)}
+
+      # One Service missing from the admin console shouldn't take down the rest.
+      failed=0
+      ${lib.concatLines (lib.mapAttrsToList (name: port: "tailscale serve --service=svc:${name} --https=443 --bg --yes http://127.0.0.1:${toString port} || failed=1") services)}
+      exit $failed
     '';
   };
 }

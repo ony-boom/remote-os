@@ -16,4 +16,5 @@ in {
   "caddy.age".publicKeys = keys;
   "vaultwarden.age".publicKeys = keys;
   "password.age".publicKeys = keys;
+  "slskd.age".publicKeys = keys;
 }
