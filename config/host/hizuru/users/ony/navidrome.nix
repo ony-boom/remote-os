@@ -21,7 +21,5 @@
       header /app/assets/* Cache-Control "public, max-age=31536000, immutable"
       reverse_proxy 127.0.0.1:4533
     '';
-
-    tailscale.serve.services.navidrome.endpoints."tcp:443" = "tls-terminated-tcp://127.0.0.1:4533";
   };
 }
