@@ -1,24 +1,31 @@
-Managing my vps with `nix` and `nixos` is a great way to ensure that my server is reproducible and maintainable. This repository contains the configuration files and scripts necessary to set up and manage my VPS using NixOS.
+# remote-os
 
-## Setup
+NixOS configuration for my VPS, deployed with [colmena](https://github.com/nix-community/colmena).
 
-- If using DigitalOcean:
+## Layout
 
-Create a new custom image from the latest NixOS
+- `config/defaults`: applied to every host (programs, services, users)
+- `config/host/<name>`: one host, with per-user services under `users/<user>`
+- `builder`: install media (DigitalOcean image, [nixos-anywhere](https://github.com/nix-community/nixos-anywhere))
+- `docs`: notes on individual services
+
+## Commands
+
+Run from `config/`:
 
 ```sh
-nix run .#buildDoImage
+make             # deploy
+make boot        # deploy, activate on next boot
+nix fmt          # format
+nix flake check  # format check, deadnix, statix
 ```
 
-That will create a `result` directory with the image file.
-Import that image into DigitalOcean and create a new droplet with it.
+## Secrets
 
-Then inside `./config`, edit `flake.nix` to add a new configuration for your new vps in the `colmena` section.
+Encrypted with agenix. Each `secrets/` folder has its own `secrets.nix`, so run
+`agenix -e <file>.age` from that folder.
 
-- Elsewhere:
+## New host
 
-Follow the instructions in the [nixos-anywhere repo](https://github.com/nix-community/nixos-anywhere) to install NixOS on the VPS using the `./builder/nixos-anywhere` directory.
-
-### Deployment
-
-Deployemnt is done using [colmena](https://github.com/zhaofengli/colmena).
+1. Install NixOS, using `builder/nixos-anywhere` or `nix run .#buildDoImage` from `builder/`.
+2. Add it to `colmenaHive` in `config/flake.nix`, with its config in `config/host/<name>`.

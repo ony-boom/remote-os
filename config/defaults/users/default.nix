@@ -15,8 +15,11 @@
     # (e.g. .zshrc -> .zshrc.hm-bak) instead of failing activation.
     backupFileExtension = "hm-bak";
 
-    # HM master runs a release ahead of nixos-unstable's string; the check is a
-    # false positive since HM follows our nixpkgs. Silence it for every user.
-    sharedModules = [{home.enableNixpkgsReleaseCheck = false;}];
+    sharedModules = [
+      # HM master runs a release ahead of nixos-unstable's string; the check is
+      # a false positive since HM follows our nixpkgs.
+      {home.enableNixpkgsReleaseCheck = false;}
+      ./home.nix
+    ];
   };
 }

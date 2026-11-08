@@ -9,11 +9,13 @@
 
     ony-world.url = "github:ony-boom/ony.world";
 
-    colmena = {
-      url = "github:zhaofengli/colmena";
-    };
+    # No follows: keeps the colmena.cachix.org binary usable.
+    colmena.url = "github:nix-community/colmena";
 
-    agenix.url = "github:ryantm/agenix";
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -34,29 +36,43 @@
 
   outputs = {
     nixpkgs,
-    disko,
     colmena,
-    self,
     ...
   } @ inputs: let
     system = "x86_64-linux";
+    pkgs = nixpkgs.legacyPackages.${system};
   in {
     apps.${system}.colmena = {
       type = "app";
       program = "${colmena.packages.${system}.colmena}/bin/colmena";
     };
-    colmenaHive = colmena.lib.makeHive self.outputs.colmena;
 
-    colmena = {
+    # `nix fmt` passes no paths, and bare alejandra reads stdin.
+    formatter.${system} = pkgs.writeShellScriptBin "fmt" ''
+      exec ${pkgs.alejandra}/bin/alejandra "''${@:-.}"
+    '';
+
+    checks.${system}.lint =
+      pkgs.runCommand "lint" {
+        nativeBuildInputs = [pkgs.alejandra pkgs.deadnix pkgs.statix];
+      } ''
+        cd ${./.}
+        alejandra --check .
+        deadnix --fail --no-lambda-pattern-names .
+        statix check --ignore host/hizuru/hardware-configuration.nix .
+        touch $out
+      '';
+
+    colmenaHive = colmena.lib.makeHive {
       meta = {
         nixpkgs = import nixpkgs {
           inherit system;
           overlays = [];
         };
-        specialArgs = {inherit inputs system disko;};
+        specialArgs = {inherit inputs;};
       };
 
-      defaults = import ./configuration.nix;
+      defaults = import ./defaults;
 
       hizuru = import ./host/hizuru;
     };

@@ -15,4 +15,5 @@ in {
   "invoice-ninja.age".publicKeys = keys;
   "caddy.age".publicKeys = keys;
   "vaultwarden.age".publicKeys = keys;
+  "password.age".publicKeys = keys;
 }

@@ -12,4 +12,5 @@ let
   keys = host ++ titosy;
 in {
   "music.age".publicKeys = keys;
+  "password.age".publicKeys = keys;
 }

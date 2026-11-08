@@ -23,7 +23,7 @@ in {
       DB_PORT = "3306";
       DB_DATABASE = "invoiceninja";
       DB_USERNAME = "invoiceninja";
-      QUEUE_CONNECTION = "sync"; # ponytail: no worker; switch to redis if queues get heavy.
+      QUEUE_CONNECTION = "sync"; # No worker; switch to redis if queues get heavy.
     };
     environmentFiles = [config.age.secrets.invoice-ninja.path];
     ports = ["127.0.0.1:${port}:9000"];
@@ -31,7 +31,6 @@ in {
       "/var/lib/invoice-ninja/public:/var/www/html/public"
       "/var/lib/invoice-ninja/storage:/var/www/html/storage"
     ];
-    autoStart = true;
   };
 
   # ensureUsers in mysql.nix creates invoiceninja@localhost with socket auth
@@ -40,10 +39,11 @@ in {
   systemd.services.invoice-ninja-db-password = {
     after = ["mysql.service"];
     wantedBy = ["multi-user.target"];
-    serviceConfig.Type = "oneshot";
-    serviceConfig.EnvironmentFile = config.age.secrets.invoice-ninja.path;
-    # ponytail: CREATE IF NOT EXISTS is enough; to rotate the password later,
-    # add an ALTER USER line or just drop the user first.
+    serviceConfig = {
+      Type = "oneshot";
+      EnvironmentFile = config.age.secrets.invoice-ninja.path;
+    };
+    # To rotate the password later, add an ALTER USER line or drop the user first.
     script = ''
       ${config.services.mysql.package}/bin/mysql -e "
         CREATE USER IF NOT EXISTS 'invoiceninja'@'%' IDENTIFIED BY '$DB_PASSWORD';

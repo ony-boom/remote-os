@@ -2,7 +2,7 @@
 
 [Garage](https://garagehq.deuxfleurs.fr) is the S3-compatible object store on
 hizuru, replacing copyparty as the place media lives. Configured in
-[`config/host/hizuru/users/ony/garage.nix`](config/host/hizuru/users/ony/garage.nix).
+[`config/host/hizuru/users/ony/garage.nix`](../config/host/hizuru/users/ony/garage.nix).
 
 One process, two doors:
 

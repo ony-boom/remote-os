@@ -5,9 +5,8 @@
 in {
   users.users.ony = {
     isNormalUser = true;
-    extraGroups = ["wheel" "networkmanager"];
+    extraGroups = ["wheel"];
     shell = pkgs.zsh;
-    hashedPassword = "$6$74ywRZqjR0/lgpMb$Uwh2Ul9FNj/u.mLtYKPkxVUL0jEjcaVyhUZ84mFShv8gbonujR/cK2lNht0KOKJjMVZ/fVqI9XSLF910g/rNO/";
     openssh.authorizedKeys.keys =
       onyKeys
       ++ [
@@ -20,17 +19,5 @@ in {
 
   nix.settings.trusted-users = ["ony"];
 
-  security.sudo.extraRules = [
-    {
-      users = ["ony"];
-      commands = [
-        {
-          command = "ALL";
-          options = ["NOPASSWD"];
-        }
-      ];
-    }
-  ];
-
-  home-manager.users.ony = import ./home.nix;
+  home-manager.users.ony = ./home.nix;
 }

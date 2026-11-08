@@ -1,7 +1,7 @@
 # Vaultwarden
 
 Bitwarden-compatible server at `https://vault.ony.world`, configured in
-[`config/host/hizuru/users/ony/vaultwarden.nix`](config/host/hizuru/users/ony/vaultwarden.nix).
+[`config/host/hizuru/users/ony/vaultwarden.nix`](../config/host/hizuru/users/ony/vaultwarden.nix).
 Any Bitwarden client works: set the server URL to that domain at login.
 
 Public vhost, so the guard is Bitwarden's own login plus `SIGNUPS_ALLOWED = false`.

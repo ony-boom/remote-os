@@ -1,6 +1,5 @@
-# Everything on hizuru that belongs to ony: personal services, web vhosts,
-# and the /home/ony media mounts. titosy's host config would be a sibling dir.
-{
+# Everything on hizuru that belongs to ony.
+{config, ...}: {
   imports = [
     ./caddy.nix
     ./garage.nix
@@ -13,4 +12,7 @@
     ./containers
     ./mounts.nix
   ];
+
+  age.secrets.ony-password.file = ./secrets/password.age;
+  users.users.ony.hashedPasswordFile = config.age.secrets.ony-password.path;
 }

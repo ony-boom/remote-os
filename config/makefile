@@ -1,6 +1,6 @@
 COLMENA ?= nix --accept-flake-config run .\#apps.x86_64-linux.colmena
 
-.PHONY: all local update-local update
+.PHONY: all boot local
 
 ## Deploy to VPS
 all:

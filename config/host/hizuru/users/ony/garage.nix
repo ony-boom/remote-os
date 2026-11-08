@@ -1,4 +1,4 @@
-# Self-hosted S3, replaces copyparty.
+# Self-hosted S3.
 {
   config,
   pkgs,

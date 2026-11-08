@@ -1,9 +1,19 @@
 {
-  disko,
+  inputs,
+  modulesPath,
   ...
 }: {
+  imports = [
+    inputs.disko.nixosModules.disko
+    (modulesPath + "/installer/scan/not-detected.nix")
+    ./disk-config.nix
+    ./hardware-configuration.nix
+    ./tailscale.nix
+    ./users/ony
+    ./users/titosy
+  ];
+
   deployment = {
-    targetPort = 22;
     # null = connect as whoever runs colmena (ony, titosy, ...), each with
     # their own account + key. CI pins `User ony` via ssh config.
     targetUser = null;
@@ -13,9 +23,8 @@
     allowLocalDeployment = true;
   };
 
-  imports = [
-    disko.nixosModules.disko
-    ./configuration.nix
-    ./hardware-configuration.nix
-  ];
+  boot.loader.grub = {
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+  };
 }

@@ -1,17 +1,16 @@
 {config, ...}: let
-  umami-settings = config.services.umami.settings;
+  inherit (config.services.umami.settings) HOSTNAME PORT;
 in {
   age.secrets.umami.file = ./secrets/umami.age;
 
-  services.umami = {
-    enable = true;
-
-    settings = {
-      APP_SECRET_FILE = config.age.secrets.umami.path;
+  services = {
+    umami = {
+      enable = true;
+      settings.APP_SECRET_FILE = config.age.secrets.umami.path;
     };
-  };
 
-  services.caddy.virtualHosts."umami.ony.world".extraConfig = ''
-    reverse_proxy http://${umami-settings.HOSTNAME}:${toString umami-settings.PORT}
-  '';
+    caddy.virtualHosts."umami.ony.world".extraConfig = ''
+      reverse_proxy http://${HOSTNAME}:${toString PORT}
+    '';
+  };
 }

@@ -3,29 +3,13 @@
 # network, fronted by Caddy at https://music.titosy.dev. Secrets via agenix.
 {
   config,
+  lib,
   pkgs,
   ...
 }: {
   # Decrypt the .env secret to /run/agenix/music at activation. Every container
   # that needs credentials reads it via environmentFiles below.
   age.secrets.music.file = ./secrets/music.age;
-
-  # Dedicated docker network: gives the containers internal DNS so the app can
-  # reach its deps by the hostnames it expects (postgres, redis). Idempotent.
-  systemd.services.init-music-network = {
-    description = "Create the 'music' docker network";
-    after = ["docker.service" "docker.socket"];
-    requires = ["docker.service"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      ${pkgs.docker}/bin/docker network inspect music >/dev/null 2>&1 \
-        || ${pkgs.docker}/bin/docker network create music
-    '';
-  };
 
   virtualisation.oci-containers.containers = {
     music-postgres = {
@@ -73,49 +57,55 @@
     };
   };
 
-  # The oci-containers backend generates docker-<name>.service units. Merge extra
-  # ordering into them so they wait for the network to exist.
-  systemd.services.docker-music-postgres = {
-    after = ["init-music-network.service"];
-    requires = ["init-music-network.service"];
-  };
-  systemd.services.docker-music-redis = {
-    after = ["init-music-network.service"];
-    requires = ["init-music-network.service"];
-  };
-  systemd.services.docker-music-minio = {
-    after = ["init-music-network.service"];
-    requires = ["init-music-network.service"];
-  };
+  systemd.services =
+    {
+      # Dedicated docker network: gives the containers internal DNS so the app can
+      # reach its deps by the hostnames it expects (postgres, redis). Idempotent.
+      init-music-network = {
+        description = "Create the 'music' docker network";
+        after = ["docker.service" "docker.socket"];
+        requires = ["docker.service"];
+        wantedBy = ["multi-user.target"];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          ${pkgs.docker}/bin/docker network inspect music >/dev/null 2>&1 \
+            || ${pkgs.docker}/bin/docker network create music
+        '';
+      };
 
-  # One-shot: create the S3 bucket once MinIO answers. Idempotent (re-runnable).
-  systemd.services.music-createbucket = {
-    description = "Create the deemix-music bucket in MinIO";
-    after = ["docker-music-minio.service"];
-    requires = ["docker-music-minio.service"];
-    wantedBy = ["multi-user.target"];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      ${pkgs.docker}/bin/docker run --rm --network music \
-        --env-file ${config.age.secrets.music.path} \
-        --entrypoint sh minio/mc -c '
-          i=0
-          while [ $i -lt 30 ]; do
-            mc alias set m http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" && break
-            i=$((i+1)); sleep 2
-          done
-          mc mb --ignore-existing "m/$MINIO_BUCKET"
-        '
-    '';
-  };
-
-  systemd.services.docker-music-web = {
-    after = ["init-music-network.service"];
-    requires = ["init-music-network.service"];
-  };
+      # One-shot: create the S3 bucket once MinIO answers. Idempotent (re-runnable).
+      music-createbucket = {
+        description = "Create the deemix-music bucket in MinIO";
+        after = ["docker-music-minio.service"];
+        requires = ["docker-music-minio.service"];
+        wantedBy = ["multi-user.target"];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          ${pkgs.docker}/bin/docker run --rm --network music \
+            --env-file ${config.age.secrets.music.path} \
+            --entrypoint sh minio/mc -c '
+              i=0
+              while [ $i -lt 30 ]; do
+                mc alias set m http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" && break
+                i=$((i+1)); sleep 2
+              done
+              mc mb --ignore-existing "m/$MINIO_BUCKET"
+            '
+        '';
+      };
+    }
+    # The oci-containers backend generates docker-<name>.service units. Merge extra
+    # ordering into them so they wait for the network to exist.
+    // lib.genAttrs (map (name: "docker-music-${name}") ["postgres" "redis" "minio" "web"]) (_: {
+      after = ["init-music-network.service"];
+      requires = ["init-music-network.service"];
+    });
 
   # Public HTTPS entrypoint. Caddy gets/renews the TLS cert automatically and
   # proxies (WebSocket upgrade included) to the web container on localhost.
