@@ -2,7 +2,7 @@
 
 [Garage](https://garagehq.deuxfleurs.fr) is the S3-compatible object store on
 hizuru, replacing copyparty as the place media lives. Configured in
-[`config/host/hizuru/users/ony/garage.nix`](../config/host/hizuru/users/ony/garage.nix).
+[`host/hizuru/users/ony/garage.nix`](../host/hizuru/users/ony/garage.nix).
 
 One process, two doors:
 
@@ -29,7 +29,7 @@ file is root-only, so every command needs `sudo`.
 ```sh
 # On maki: the RPC secret. Single node, loopback RPC, but Garage won't start
 # without it.
-cd config/host/hizuru/users/ony/secrets
+cd host/hizuru/users/ony/secrets
 agenix -e garage.age          # GARAGE_RPC_SECRET=<openssl rand -hex 32>
 ```
 

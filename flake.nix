@@ -37,6 +37,7 @@
   outputs = {
     nixpkgs,
     colmena,
+    disko,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -45,6 +46,10 @@
     apps.${system}.colmena = {
       type = "app";
       program = "${colmena.packages.${system}.colmena}/bin/colmena";
+    };
+
+    devShells.${system}.default = pkgs.mkShell {
+      packages = [pkgs.just pkgs.opentofu];
     };
 
     # `nix fmt` passes no paths, and bare alejandra reads stdin.
@@ -59,9 +64,19 @@
         cd ${./.}
         alejandra --check .
         deadnix --fail --no-lambda-pattern-names .
-        statix check --ignore host/hizuru/hardware-configuration.nix .
+        statix check -i host/hizuru/hardware-configuration.nix -i builder/hardware-configuration.nix .
         touch $out
       '';
+
+    # Installed by builder/main.tf on new hosts; colmena takes over from there.
+    nixosConfigurations.generic = nixpkgs.lib.nixosSystem {
+      inherit system;
+      modules = [
+        disko.nixosModules.disko
+        ./builder/configuration.nix
+        ./builder/hardware-configuration.nix
+      ];
+    };
 
     colmenaHive = colmena.lib.makeHive {
       meta = {

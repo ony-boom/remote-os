@@ -4,20 +4,21 @@ NixOS configuration for my VPS, deployed with [colmena](https://github.com/nix-c
 
 ## Layout
 
-- `config/defaults`: applied to every host (programs, services, users)
-- `config/host/<name>`: one host, with per-user services under `users/<user>`
-- `builder`: install media (DigitalOcean image, [nixos-anywhere](https://github.com/nix-community/nixos-anywhere))
+- `defaults`: applied to every host (programs, services, users)
+- `host/<name>`: one host, with per-user services under `users/<user>`
+- `builder`: OpenTofu config that creates Contabo VPSes and installs NixOS with [nixos-anywhere](https://github.com/nix-community/nixos-anywhere)
 - `docs`: notes on individual services
 
 ## Commands
 
-Run from `config/`:
+`just` is in `nix develop`.
 
 ```sh
-make             # deploy
-make boot        # deploy, activate on next boot
-nix fmt          # format
-nix flake check  # format check, deadnix, statix
+just             # deploy
+just boot        # deploy, activate on next boot
+just fmt         # format
+just check       # format check, deadnix, statix
+just provision   # create new hosts (see below)
 ```
 
 ## Secrets
@@ -27,5 +28,14 @@ Encrypted with agenix. Each `secrets/` folder has its own `secrets.nix`, so run
 
 ## New host
 
-1. Install NixOS, using `builder/nixos-anywhere` or `nix run .#buildDoImage` from `builder/`.
-2. Add it to `colmenaHive` in `config/flake.nix`, with its config in `config/host/<name>`.
+1. Add the host to `builder/terraform.tfvars`:
+
+   ```hcl
+   hosts = { foo = { product_id = "<id>" } }
+   ```
+
+   Product ids are in Contabo's API docs. Then, with the `CNTB_OAUTH2_*`
+   Contabo API credentials exported, run `just provision`. This buys the VPS
+   and installs a minimal NixOS on it. Removing a host and provisioning again
+   cancels it.
+2. Add it to `colmenaHive` in `flake.nix`, with its config in `host/<name>`.

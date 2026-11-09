@@ -1,7 +1,7 @@
 # Vaultwarden
 
 Bitwarden-compatible server at `https://vault.ony.world`, configured in
-[`config/host/hizuru/users/ony/vaultwarden.nix`](../config/host/hizuru/users/ony/vaultwarden.nix).
+[`host/hizuru/users/ony/vaultwarden.nix`](../host/hizuru/users/ony/vaultwarden.nix).
 Any Bitwarden client works: set the server URL to that domain at login.
 
 Public vhost, so the guard is Bitwarden's own login plus `SIGNUPS_ALLOWED = false`.
@@ -19,7 +19,7 @@ SQLite lives in `/var/lib/vaultwarden`, with a nightly copy in `/var/backup/vaul
 password it hashes, on a comment line:
 
 ```sh
-cd config/host/hizuru/users/ony/secrets
+cd host/hizuru/users/ony/secrets
 agenix -d vaultwarden.age
 ```
 
@@ -34,5 +34,5 @@ agenix -e vaultwarden.age        # ADMIN_TOKEN=<hash>, no quoting or $$ escaping
 
 ```sh
 # 2. Deploy, then create the first account at https://vault.ony.world/admin
-cd config && make
+just
 ```

@@ -23,9 +23,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: ./config
 
     steps:
       - uses: actions/checkout@v5
@@ -66,7 +63,7 @@ jobs:
           chmod 600 ~/.ssh/config
 
       - name: Deploy with Colmena
-        run: make
+        run: nix develop -c just deploy
 
       - name: Push flake.lock
         if: success()
