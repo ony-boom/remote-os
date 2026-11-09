@@ -1,4 +1,4 @@
-name: Auto Deploy Apps
+name: Update inputs
 
 on:
   repository_dispatch:
@@ -13,20 +13,21 @@ on:
         options: [all, ony-world]
 
 concurrency:
-  group: deploy
+  group: update
   cancel-in-progress: false
 
 env:
   APP_NAME: ${{ github.event.client_payload.app_name || inputs.app_name }}
 
 jobs:
-  deploy:
+  update:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v5
         with:
+          # Unlike GITHUB_TOKEN, a PAT push triggers CI, which then deploys.
           token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
 
@@ -35,12 +36,6 @@ jobs:
           extra_nix_config: |
             accept-flake-config = true
             experimental-features = nix-command flakes
-
-      - uses: cachix/cachix-action@v17
-        with:
-          name: ony-boom
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          extraPullNames: colmena
 
       - name: Update flake input
         run: |
@@ -52,21 +47,7 @@ jobs:
             nix flake update "$APP_NAME" --commit-lock-file
           fi
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
-          # targetUser is null in the flake, so pin the deploy account here.
-          printf 'Host %s\n  User ony\n' "${{ secrets.VPS_HOST }}" > ~/.ssh/config
-          chmod 600 ~/.ssh/config
-
-      - name: Deploy with Colmena
-        run: nix develop -c just deploy
-
       - name: Push flake.lock
-        if: success()
         run: |
           git pull --rebase origin ${{ github.ref_name }}
           git push origin HEAD:${{ github.ref_name }}

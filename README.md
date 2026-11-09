@@ -21,6 +21,13 @@ just check       # format check, deadnix, statix
 just provision   # create new hosts (see below)
 ```
 
+## CI
+
+Every PR and push runs `nix flake check` and builds hizuru, pushing it to
+Cachix. On `main`, CI deploys once both pass. `update.yml` bumps flake inputs
+(e.g. on an ony.world release) and pushes, which runs CI. `just deploy` skips
+all of this.
+
 ## Secrets
 
 Encrypted with agenix. Each `secrets/` folder has its own `secrets.nix`, so run
