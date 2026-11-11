@@ -1,5 +1,10 @@
-# Soulseek client, used by lidarr as indexer and download client.
-{config, ...}: {
+# Soulseek client; search and download single tracks from its web UI. beets
+# files finished downloads into the library.
+{
+  config,
+  pkgs,
+  ...
+}: {
   age.secrets.slskd.file = ./secrets/slskd.age;
 
   services.slskd = {
@@ -14,6 +19,12 @@
     settings = {
       web.ip_address = "127.0.0.1";
       shares.directories = ["/media/music"];
+      # Starts beets-import, see beets.nix.
+      integrations.scripts.beets.on = ["DownloadFileComplete"];
+      integrations.scripts.beets.run = {
+        executable = "${pkgs.coreutils}/bin/touch";
+        arglist = ["/var/lib/slskd/import-pending"];
+      };
     };
   };
 }

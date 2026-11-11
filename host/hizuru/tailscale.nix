@@ -11,7 +11,6 @@
   services = {
     navidrome = config.services.navidrome.settings.Port;
     filebrowser = config.services.filebrowser.settings.port;
-    lidarr = config.services.lidarr.settings.server.port;
     slskd = config.services.slskd.settings.web.port;
   };
 in {
