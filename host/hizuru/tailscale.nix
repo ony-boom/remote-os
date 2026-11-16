@@ -12,6 +12,7 @@
     navidrome = config.services.navidrome.settings.Port;
     filebrowser = config.services.filebrowser.settings.port;
     slskd = config.services.slskd.settings.web.port;
+    music-import = config.systemd.services.music-import.environment.PORT;
   };
 in {
   services.tailscale = {

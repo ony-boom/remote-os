@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music import</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --fg: #1d1d1f; --bg: #f5f5f7; --card: #fff; --muted: #6e6e73;
+    --line: rgb(0 0 0 / 0.1); --track: rgb(0 0 0 / 0.06);
+    --accent: #0a7cff; --ok: #1f9d55; --warn: #b26b00; --bad: #d93036;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #f5f5f7; --bg: #111113; --card: #1c1c1f; --muted: #98989f;
+      --line: rgb(255 255 255 / 0.1); --track: rgb(255 255 255 / 0.08);
+      --accent: #3b9bff; --ok: #3dd68c; --warn: #f5a524; --bad: #ff6369;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 48px 16px;
+    font: 15px/1.5 system-ui, sans-serif; color: var(--fg); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 640px; margin: auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; text-wrap: balance; }
+  .lead { margin: 0 0 24px; color: var(--muted); }
+
+  #zone {
+    display: grid; place-items: center; gap: 4px;
+    padding: 40px 16px; border: 2px dashed var(--line); border-radius: 16px;
+    background: var(--card); text-align: center; cursor: pointer;
+    transition: border-color 160ms ease-out, background-color 160ms ease-out, transform 160ms ease-out;
+  }
+  #zone:hover, #zone:focus-visible { border-color: var(--accent); outline: none; }
+  #zone:active { transform: scale(0.99); }
+  body.dragging #zone { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--card)); }
+  #zone strong { font-size: 16px; }
+  #zone span { color: var(--muted); font-size: 13px; }
+  #pick { display: none; }
+
+  #summary { margin: 24px 0 8px; min-height: 1.5em; font-weight: 500; font-variant-numeric: tabular-nums; }
+  #summary.done { color: var(--ok); }
+  #summary.bad { color: var(--bad); }
+
+  ul { list-style: none; padding: 0; margin: 0; background: var(--card); border-radius: 12px; overflow: hidden; }
+  ul:empty { display: none; }
+  li { display: grid; grid-template-columns: 20px 1fr auto; gap: 4px 12px; align-items: center; padding: 12px 16px; }
+  li + li { border-top: 1px solid var(--line); }
+  .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .state { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
+  .detail { grid-column: 2 / -1; color: var(--muted); font-size: 13px; }
+  .detail:empty { display: none; }
+  .icon { width: 20px; height: 20px; display: grid; place-items: center; font-size: 13px; font-weight: 700; border-radius: 50%; }
+  .bar { grid-column: 2 / -1; height: 4px; border-radius: 2px; background: var(--track); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: inherit; transition: width 120ms linear; }
+  li:not(.uploading, .importing) .bar { display: none; }
+  li.importing .bar i { width: 30%; animation: slide 1.2s ease-in-out infinite; }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+
+  li.queued .icon { border: 2px solid var(--line); }
+  li.uploading .icon, li.importing .icon { border: 2px solid var(--track); border-top-color: var(--accent); animation: spin 800ms linear infinite; }
+  @keyframes spin { to { transform: rotate(1turn); } }
+  li.imported .icon { background: var(--ok); color: var(--card); }
+  li.imported .state { color: var(--ok); }
+  li.skipped .icon { background: var(--warn); color: var(--card); }
+  li.skipped .state { color: var(--warn); }
+  li.failed .icon { background: var(--bad); color: var(--card); }
+  li.failed .state { color: var(--bad); }
+
+  button {
+    font: inherit; font-size: 13px; color: var(--accent); background: none; border: 0;
+    padding: 6px 8px; margin: -6px -8px; border-radius: 6px; cursor: pointer;
+    transition: background-color 120ms ease-out, transform 120ms ease-out;
+  }
+  button:hover { background: var(--track); }
+  button:active { transform: scale(0.96); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
+    li.importing .bar i { width: 100%; opacity: 0.5; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Music import</h1>
+  <p class="lead">Songs are uploaded to hizuru, tagged by beets and filed into the library.</p>
+
+  <label id="zone" tabindex="0">
+    <strong>Drop songs anywhere</strong>
+    <span>or click to choose · FLAC, MP3, M4A, OGG, Opus, WAV</span>
+    <input id="pick" type="file" multiple accept=".flac,.mp3,.m4a,.ogg,.opus,.wav,.aif,.aiff,.wv,.ape">
+  </label>
+
+  <p id="summary" role="status" aria-live="polite"></p>
+  <ul id="list"></ul>
+</main>
+<script>
+  const AUDIO = /\.(flac|mp3|m4a|ogg|opus|wav|aiff?|wv|ape)$/i;
+  const ICON = { imported: "✓", skipped: "!", failed: "✕" };
+  const list = document.getElementById("list");
+  const summary = document.getElementById("summary");
+  const items = [];
+  let queue = Promise.resolve();
+  let polling = false;
+
+  const size = (n) => n < 1e6 ? Math.round(n / 1e3) + " KB" : (n / 1e6).toFixed(1) + " MB";
+
+  function add(files) {
+    for (const file of files) {
+      const li = document.createElement("li");
+      li.innerHTML = '<span class="icon" aria-hidden="true"></span><span class="name"></span><span class="state"></span><span class="bar"><i></i></span><span class="detail"></span>';
+      li.querySelector(".name").textContent = file.name;
+      li.title = file.name;
+      list.prepend(li);
+      const item = { file, li };
+      items.push(item);
+      if (!AUDIO.test(file.name)) {
+        set(item, "failed", "Not a song", "Only audio files can be imported.");
+        continue;
+      }
+      enqueue(item);
+    }
+    render();
+  }
+
+  function enqueue(item) {
+    set(item, "queued", "Waiting", "");
+    queue = queue.then(() => upload(item));
+  }
+
+  function set(item, state, label, detail) {
+    item.state = state;
+    item.li.className = state;
+    item.li.querySelector(".state").textContent = label;
+    item.li.querySelector(".icon").textContent = ICON[state] || "";
+    if (detail !== undefined) item.li.querySelector(".detail").textContent = detail;
+    if (state === "failed") {
+      const retry = document.createElement("button");
+      retry.textContent = "Retry";
+      retry.onclick = () => { enqueue(item); render(); };
+      if (AUDIO.test(item.file.name)) item.li.querySelector(".state").append(" · ", retry);
+    }
+    render();
+  }
+
+  function upload(item) {
+    return new Promise((resolve) => {
+      const { file } = item;
+      const bar = item.li.querySelector(".bar i");
+      const xhr = new XMLHttpRequest();
+      set(item, "uploading", "0%", size(file.size));
+      bar.style.width = "0";
+      xhr.open("PUT", "/upload/" + encodeURIComponent(file.name));
+      xhr.upload.onprogress = (e) => {
+        if (!e.lengthComputable) return;
+        const pct = Math.round((e.loaded / e.total) * 100);
+        bar.style.width = pct + "%";
+        set(item, "uploading", pct + "%", size(e.loaded) + " of " + size(e.total));
+      };
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          set(item, "importing", "Importing", "Matching tags and fetching lyrics with beets…");
+          poll();
+        } else {
+          let reason = "Server answered " + xhr.status + ".";
+          try { reason = JSON.parse(xhr.responseText).error || reason; } catch {}
+          set(item, "failed", "Upload failed", reason.charAt(0).toUpperCase() + reason.slice(1));
+        }
+        resolve();
+      };
+      xhr.onerror = () => {
+        set(item, "failed", "Upload failed", "Couldn't reach hizuru. Are you on the tailnet?");
+        resolve();
+      };
+      xhr.send(file);
+    });
+  }
+
+  async function poll() {
+    if (polling) return;
+    polling = true;
+    let misses = 0;
+    while (items.some((i) => i.state === "importing")) {
+      await new Promise((r) => setTimeout(r, 1500));
+      let s;
+      try { s = await (await fetch("/status")).json(); misses = 0; }
+      catch {
+        if (++misses === 5) for (const i of items) if (i.state === "importing") set(i, "importing", "Importing", "Lost contact with hizuru, still trying…");
+        continue;
+      }
+      for (const item of items) {
+        if (item.state !== "importing") continue;
+        if (!s.waiting.includes(item.file.name)) set(item, "imported", "Imported", "In the library, Navidrome will pick it up shortly.");
+        else if (!s.importing) set(item, "skipped", "Skipped", "Beets left it out, most likely it's already in the library.");
+      }
+    }
+    polling = false;
+  }
+
+  function render() {
+    const count = (st) => items.filter((i) => i.state === st).length;
+    const busy = count("queued") + count("uploading") + count("importing");
+    const [ok, skipped, failed] = [count("imported"), count("skipped"), count("failed")];
+    const parts = [];
+    if (busy) parts.push(`${items.length - busy} of ${items.length} done`);
+    if (ok) parts.push(`${ok} imported`);
+    if (skipped) parts.push(`${skipped} skipped`);
+    if (failed) parts.push(`${failed} failed`);
+    if (!busy && items.length && ok === items.length) {
+      summary.textContent = ok === 1 ? "Imported 1 song" : `All ${ok} songs imported`;
+    } else {
+      summary.textContent = parts.join(" · ");
+    }
+    summary.className = !busy && items.length ? (failed ? "bad" : ok ? "done" : "") : "";
+    document.title = busy ? `(${items.length - busy}/${items.length}) Music import` : "Music import";
+  }
+
+  const pick = document.getElementById("pick");
+  pick.onchange = () => { add(pick.files); pick.value = ""; };
+  document.getElementById("zone").onkeydown = (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick.click(); }
+  };
+
+  // The whole page is a drop target, not just the box.
+  let depth = 0;
+  addEventListener("dragenter", (e) => { e.preventDefault(); depth++; document.body.classList.add("dragging"); });
+  addEventListener("dragleave", () => { if (--depth === 0) document.body.classList.remove("dragging"); });
+  addEventListener("dragover", (e) => e.preventDefault());
+  addEventListener("drop", (e) => {
+    e.preventDefault();
+    depth = 0;
+    document.body.classList.remove("dragging");
+    add(e.dataTransfer.files);
+  });
+
+  addEventListener("beforeunload", (e) => {
+    if (items.some((i) => i.state === "queued" || i.state === "uploading")) e.preventDefault();
+  });
+</script>
+</body>
+</html>
