@@ -52,17 +52,25 @@
       packages = [pkgs.just pkgs.opentofu];
     };
 
-    # `nix fmt` passes no paths, and bare alejandra reads stdin.
-    formatter.${system} = pkgs.writeShellScriptBin "fmt" ''
-      exec ${pkgs.alejandra}/bin/alejandra "''${@:-.}"
-    '';
+    formatter.${system} = pkgs.writeShellApplication {
+      name = "fmt";
+      runtimeInputs = [pkgs.alejandra pkgs.prettier pkgs.ruff];
+      text = ''
+        alejandra -q .
+        prettier --write --log-level warn '**/*.html'
+        ruff format -q .
+      '';
+    };
 
     checks.${system}.lint =
       pkgs.runCommand "lint" {
-        nativeBuildInputs = [pkgs.alejandra pkgs.deadnix pkgs.statix];
+        nativeBuildInputs = [pkgs.alejandra pkgs.deadnix pkgs.statix pkgs.prettier pkgs.ruff];
       } ''
         cd ${./.}
         alejandra --check .
+        prettier --check '**/*.html'
+        ruff format --check --no-cache .
+        ruff check --no-cache .
         deadnix --fail --no-lambda-pattern-names .
         statix check -i host/hizuru/hardware-configuration.nix -i builder/hardware-configuration.nix .
         touch $out
