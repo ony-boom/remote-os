@@ -6,6 +6,7 @@
     ./navidrome.nix
     ./slskd.nix
     ./beets.nix
+    ./music-import.nix
     ./vaultwarden.nix
     ./filebrowser.nix
     ./umami.nix

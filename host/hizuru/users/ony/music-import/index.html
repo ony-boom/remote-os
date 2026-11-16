@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Music import</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --fg: #1d1d1f;
+        --bg: #f5f5f7;
+        --card: #fff;
+        --muted: #6e6e73;
+        --line: rgb(0 0 0 / 0.1);
+        --track: rgb(0 0 0 / 0.06);
+        --accent: #0a7cff;
+        --ok: #1f9d55;
+        --warn: #b26b00;
+        --bad: #d93036;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #f5f5f7;
+          --bg: #111113;
+          --card: #1c1c1f;
+          --muted: #98989f;
+          --line: rgb(255 255 255 / 0.1);
+          --track: rgb(255 255 255 / 0.08);
+          --accent: #3b9bff;
+          --ok: #3dd68c;
+          --warn: #f5a524;
+          --bad: #ff6369;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 48px 16px;
+        font:
+          15px/1.5 system-ui,
+          sans-serif;
+        color: var(--fg);
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        max-width: 640px;
+        margin: auto;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+        text-wrap: balance;
+      }
+      .lead {
+        margin: 0 0 24px;
+        color: var(--muted);
+      }
+
+      #zone {
+        display: grid;
+        place-items: center;
+        gap: 4px;
+        padding: 40px 16px;
+        border: 2px dashed var(--line);
+        border-radius: 16px;
+        background: var(--card);
+        text-align: center;
+        cursor: pointer;
+        transition:
+          border-color 160ms ease-out,
+          background-color 160ms ease-out,
+          transform 160ms ease-out;
+      }
+      #zone:hover,
+      #zone:focus-visible {
+        border-color: var(--accent);
+        outline: none;
+      }
+      #zone:active {
+        transform: scale(0.99);
+      }
+      body.dragging #zone {
+        border-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, var(--card));
+      }
+      #zone strong {
+        font-size: 16px;
+      }
+      #zone span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      #pick {
+        display: none;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin: 24px 0 8px;
+        min-height: 32px;
+      }
+      #summary {
+        margin: 0;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+      }
+      #summary.done {
+        color: var(--ok);
+      }
+      #summary.bad {
+        color: var(--bad);
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background: var(--card);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      ul:empty {
+        display: none;
+      }
+      li {
+        display: grid;
+        grid-template-columns: 20px 1fr auto;
+        gap: 4px 12px;
+        align-items: center;
+        padding: 12px 16px;
+      }
+      li + li {
+        border-top: 1px solid var(--line);
+      }
+      .name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .side {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .state {
+        color: var(--muted);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+      .detail {
+        grid-column: 2 / -1;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .detail:empty {
+        display: none;
+      }
+      .icon {
+        width: 20px;
+        height: 20px;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        font-weight: 700;
+        border-radius: 50%;
+      }
+      .bar {
+        grid-column: 2 / -1;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--track);
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: var(--accent);
+        border-radius: inherit;
+        transition: width 120ms linear;
+      }
+      li:not(.uploading, .importing) .bar {
+        display: none;
+      }
+      li.importing .bar i {
+        width: 30%;
+        animation: slide 1.2s ease-in-out infinite;
+      }
+      @keyframes slide {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(340%);
+        }
+      }
+
+      li.queued .icon,
+      li.cancelled .icon {
+        border: 2px solid var(--line);
+      }
+      li.uploading .icon,
+      li.importing .icon {
+        border: 2px solid var(--track);
+        border-top-color: var(--accent);
+        animation: spin 800ms linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(1turn);
+        }
+      }
+      li.imported .icon {
+        background: var(--ok);
+        color: var(--card);
+      }
+      li.imported .state {
+        color: var(--ok);
+      }
+      li.skipped .icon {
+        background: var(--warn);
+        color: var(--card);
+      }
+      li.skipped .state {
+        color: var(--warn);
+      }
+      li.failed .icon {
+        background: var(--bad);
+        color: var(--card);
+      }
+      li.failed .state {
+        color: var(--bad);
+      }
+
+      button {
+        font: inherit;
+        font-size: 13px;
+        color: var(--accent);
+        background: none;
+        border: 0;
+        min-height: 32px;
+        padding: 0 8px;
+        margin: -6px -8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition:
+          background-color 120ms ease-out,
+          transform 120ms ease-out;
+      }
+      button:hover {
+        background: var(--track);
+      }
+      button:active {
+        transform: scale(0.96);
+      }
+      button:disabled {
+        color: var(--muted);
+        cursor: default;
+      }
+      button[hidden] {
+        display: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0s !important;
+          transition-duration: 0s !important;
+        }
+        li.importing .bar i {
+          width: 100%;
+          opacity: 0.5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Music import</h1>
+      <p class="lead">
+        Songs are uploaded to hizuru, tagged by beets and filed into the
+        library.
+      </p>
+
+      <label id="zone" tabindex="0">
+        <strong>Drop songs anywhere</strong>
+        <span>or click to choose · FLAC, MP3, M4A, OGG, Opus, WAV</span>
+        <input
+          id="pick"
+          type="file"
+          multiple
+          accept=".flac,.mp3,.m4a,.ogg,.opus,.wav,.aif,.aiff,.wv,.ape"
+        />
+      </label>
+
+      <header>
+        <p id="summary" role="status" aria-live="polite"></p>
+        <button id="clear" type="button" hidden>Clear finished</button>
+      </header>
+      <ul id="list"></ul>
+    </main>
+
+    <template id="row">
+      <li>
+        <span class="icon" aria-hidden="true"></span>
+        <span class="name"></span>
+        <span class="side">
+          <span class="state"></span>
+          <button type="button" hidden></button>
+        </span>
+        <span class="bar"><i></i></span>
+        <span class="detail"></span>
+      </li>
+    </template>
+
+    <script>
+      const AUDIO = /\.(flac|mp3|m4a|ogg|opus|wav|aiff?|wv|ape)$/i;
+      const POLL_MS = 1500;
+
+      // Everything a row shows follows from its state. `action` names the one
+      // thing the row's button does in that state, if anything.
+      const STATES = {
+        queued: { label: "Waiting", action: "cancel" },
+        uploading: { action: "cancel" },
+        importing: { label: "Importing" },
+        imported: { label: "Imported", icon: "✓", finished: true },
+        skipped: { label: "Skipped", icon: "!", action: "remove" },
+        failed: { label: "Failed", icon: "✕", action: "retry", finished: true },
+        cancelled: { label: "Cancelled", action: "retry", finished: true },
+      };
+      const ACTIONS = { cancel: "Cancel", retry: "Retry", remove: "Remove" };
+
+      // Beets' import log verdicts for files it left out.
+      const VERDICTS = {
+        "duplicate-skip": "Already in the library, so beets skipped it.",
+        skip: "Beets skipped it.",
+      };
+
+      const list = document.getElementById("list");
+      const summary = document.getElementById("summary");
+      const clear = document.getElementById("clear");
+      const pick = document.getElementById("pick");
+      const rowTemplate = document.getElementById("row");
+
+      /** @type {{name: string, file?: File, state: string, label?: string, detail?: string, progress?: number, xhr?: XMLHttpRequest, li: HTMLLIElement}[]} */
+      let items = [];
+      let uploading = false;
+      let polling = false;
+
+      const size = (n) =>
+        n < 1e6 ? `${Math.round(n / 1e3)} KB` : `${(n / 1e6).toFixed(1)} MB`;
+
+      function addItem(name, file) {
+        const li = rowTemplate.content.firstElementChild.cloneNode(true);
+        li.querySelector(".name").textContent = name;
+        li.title = name;
+        li.querySelector("button").onclick = () => act(item);
+        list.prepend(li);
+        const item = { name, file, li };
+        items.push(item);
+        return item;
+      }
+
+      function set(item, state, changes = {}) {
+        Object.assign(item, { state, label: undefined, detail: "" }, changes);
+        draw(item);
+        drawSummary();
+      }
+
+      function draw(item) {
+        const { li, state } = item;
+        const spec = STATES[state];
+        const button = li.querySelector("button");
+        // Without the File (restored after a reload) there's nothing to retry.
+        const action =
+          spec.action === "retry" && !item.file ? undefined : spec.action;
+        li.className = state;
+        li.querySelector(".icon").textContent = spec.icon ?? "";
+        li.querySelector(".state").textContent = item.label ?? spec.label;
+        li.querySelector(".detail").textContent = item.detail;
+        li.querySelector(".bar i").style.width =
+          state === "uploading" ? `${item.progress ?? 0}%` : "";
+        button.hidden = !action;
+        button.disabled = false;
+        button.textContent = ACTIONS[action] ?? "";
+        button.dataset.action = action ?? "";
+      }
+
+      function drawSummary() {
+        const count = (state) => items.filter((i) => i.state === state).length;
+        const finished = items.filter((i) => STATES[i.state].finished).length;
+        const busy = count("queued") + count("uploading") + count("importing");
+        const imported = count("imported");
+        const skipped = count("skipped");
+        const failed = count("failed");
+        const cancelled = count("cancelled");
+
+        const parts = [];
+        if (busy) parts.push(`${items.length - busy} of ${items.length} done`);
+        if (imported) parts.push(`${imported} imported`);
+        if (skipped) parts.push(`${skipped} skipped`);
+        if (failed) parts.push(`${failed} failed`);
+        if (cancelled) parts.push(`${cancelled} cancelled`);
+
+        const allImported = !busy && imported && imported === items.length;
+        summary.textContent = allImported
+          ? imported === 1
+            ? "Imported 1 song"
+            : `All ${imported} songs imported`
+          : parts.join(" · ");
+        summary.className =
+          busy || !items.length ? "" : failed ? "bad" : imported ? "done" : "";
+        clear.hidden = !finished;
+        document.title = busy
+          ? `(${items.length - busy}/${items.length}) Music import`
+          : "Music import";
+      }
+
+      function addFiles(files) {
+        for (const file of files) {
+          const item = addItem(file.name, file);
+          if (AUDIO.test(file.name)) set(item, "queued");
+          else
+            set(item, "failed", {
+              label: "Not a song",
+              detail: "Only audio files can be imported.",
+              file: undefined,
+            });
+        }
+        uploadNext();
+      }
+
+      async function act(item) {
+        const button = item.li.querySelector("button");
+        switch (button.dataset.action) {
+          case "cancel":
+            if (item.xhr) item.xhr.abort();
+            else set(item, "cancelled");
+            break;
+          case "retry":
+            set(item, "queued");
+            uploadNext();
+            break;
+          case "remove":
+            button.disabled = true;
+            try {
+              await request("DELETE", item.name);
+              forget(item);
+            } catch (error) {
+              set(item, "skipped", { detail: error.message });
+            }
+            break;
+        }
+      }
+
+      function forget(item) {
+        item.li.remove();
+        items = items.filter((i) => i !== item);
+        drawSummary();
+      }
+
+      // Uploads one file at a time, so each gets the full bandwidth.
+      async function uploadNext() {
+        if (uploading) return;
+        uploading = true;
+        let item;
+        while ((item = items.find((i) => i.state === "queued"))) {
+          await upload(item);
+        }
+        uploading = false;
+      }
+
+      function upload(item) {
+        const { file } = item;
+        return new Promise((resolve) => {
+          const xhr = new XMLHttpRequest();
+          item.xhr = xhr;
+          const done = (state, changes) => {
+            item.xhr = undefined;
+            set(item, state, changes);
+            if (state === "importing") pollStatus();
+            resolve();
+          };
+          const progress = (loaded) =>
+            set(item, "uploading", {
+              progress: Math.round((loaded / file.size) * 100),
+              label: `${Math.round((loaded / file.size) * 100)}%`,
+              detail: `${size(loaded)} of ${size(file.size)}`,
+            });
+
+          xhr.open("PUT", `/upload/${encodeURIComponent(file.name)}`);
+          xhr.upload.onprogress = (e) => progress(e.loaded);
+          xhr.onload = () =>
+            xhr.status < 300
+              ? done("importing", {
+                  detail: "Matching tags and fetching lyrics with beets…",
+                })
+              : done("failed", { detail: errorMessage(xhr) });
+          xhr.onerror = () =>
+            done("failed", {
+              detail: "Couldn't reach hizuru. Are you on the tailnet?",
+            });
+          xhr.onabort = () => done("cancelled");
+          progress(0);
+          xhr.send(file);
+        });
+      }
+
+      function errorMessage(xhr) {
+        try {
+          return JSON.parse(xhr.responseText).error;
+        } catch {
+          return `hizuru answered ${xhr.status} ${xhr.statusText}.`.trim();
+        }
+      }
+
+      async function request(method, name) {
+        let response;
+        try {
+          response = await fetch(`/upload/${encodeURIComponent(name)}`, {
+            method,
+          });
+        } catch {
+          throw new Error("Couldn't reach hizuru.");
+        }
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          throw new Error(body.error ?? `hizuru answered ${response.status}.`);
+        }
+      }
+
+      async function fetchStatus() {
+        const response = await fetch("/status", { cache: "no-store" });
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      }
+
+      // Settles importing rows: gone from staging means beets took it;
+      // still there once beets is done means it was left out.
+      function applyStatus({ import: beets, staged }) {
+        for (const item of items) {
+          if (item.state !== "importing") continue;
+          if (!(item.name in staged)) {
+            set(item, "imported", {
+              detail: "In the library. Navidrome picks it up shortly.",
+            });
+          } else if (beets === "failed") {
+            set(item, "failed", {
+              label: "Import failed",
+              detail: "beets-import failed on hizuru, see its journal.",
+            });
+          } else if (beets === "idle") {
+            set(item, "skipped", {
+              detail:
+                VERDICTS[staged[item.name]] ??
+                "Beets left it out, most likely it's already in the library.",
+            });
+          }
+        }
+      }
+
+      async function pollStatus() {
+        if (polling) return;
+        polling = true;
+        let misses = 0;
+        while (items.some((i) => i.state === "importing")) {
+          await new Promise((r) => setTimeout(r, POLL_MS));
+          try {
+            applyStatus(await fetchStatus());
+            misses = 0;
+          } catch {
+            if (++misses === 3) {
+              for (const item of items.filter((i) => i.state === "importing"))
+                set(item, "importing", {
+                  detail: "Lost contact with hizuru, still trying…",
+                });
+            }
+          }
+        }
+        polling = false;
+      }
+
+      // Files staged before this page was opened: still importing, or left
+      // out by beets and waiting to be removed.
+      async function restore() {
+        let status;
+        try {
+          status = await fetchStatus();
+        } catch {
+          return;
+        }
+        for (const name of Object.keys(status.staged)) {
+          if (items.some((i) => i.name === name)) continue;
+          set(addItem(name), "importing", {
+            detail: "Uploaded earlier, waiting on beets…",
+          });
+        }
+        applyStatus(status);
+        pollStatus();
+      }
+
+      clear.onclick = () =>
+        items.filter((i) => STATES[i.state].finished).forEach(forget);
+
+      pick.onchange = () => {
+        addFiles(pick.files);
+        pick.value = "";
+      };
+      document.getElementById("zone").onkeydown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          pick.click();
+        }
+      };
+
+      // The whole page is a drop target, not just the box.
+      let dragDepth = 0;
+      addEventListener("dragenter", (e) => {
+        e.preventDefault();
+        dragDepth++;
+        document.body.classList.add("dragging");
+      });
+      addEventListener("dragleave", () => {
+        if (--dragDepth === 0) document.body.classList.remove("dragging");
+      });
+      addEventListener("dragover", (e) => e.preventDefault());
+      addEventListener("drop", (e) => {
+        e.preventDefault();
+        dragDepth = 0;
+        document.body.classList.remove("dragging");
+        addFiles(e.dataTransfer.files);
+      });
+
+      addEventListener("beforeunload", (e) => {
+        if (items.some((i) => i.state === "queued" || i.state === "uploading"))
+          e.preventDefault();
+      });
+
+      restore();
+    </script>
+  </body>
+</html>
