@@ -10,6 +10,8 @@
         MusicFolder = "/media/music";
         # The 100MB default evicts covers, which then get regenerated on demand.
         ImageCacheSize = "2GB";
+        # Rocksky speaks the ListenBrainz protocol.
+        ListenBrainz.BaseURL = "https://audioscrobbler.rocksky.app/1/";
       };
     };
 
